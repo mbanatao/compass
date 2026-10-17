@@ -91,7 +91,7 @@ const defaultGoals=[
 {id:'finance',name:'FINANCE',direction:180,description:'Keep cash flow, obligations, and business economics visible.',nextAction:'Review the highest-value open financial loop.',importance:4,urgency:4,impact:4,momentum:3,confidence:3,progress:42,status:'active',deadline:''},
 {id:'people',name:'PEOPLE',direction:270,description:'Maintain the relationships and trust that matter over the long term.',nextAction:'Reach out to one important person.',importance:3,urgency:2,impact:4,momentum:3,confidence:4,progress:70,status:'active',deadline:''}
 ];
-const defaultState=()=>({goals:defaultGoals.map(g=>({...g})),events:[],currentFocus:'finance',mode:'today',override:null,theme:'dark',actionStarted:null});let state=defaultState();let editingId=null;let appUser=null;let remoteConnected=false;let sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};let emailWorkspace={providers:{},connections:[],signals:[]};let emailWorkspaceLoading=false;const requestedEmailAccounts=[{email:'joven_ong@hotmail.com',provider:'microsoft'},{email:'joven.ong23@gmail.com',provider:'google'},{email:'jovenongz@gmail.com',provider:'google'},{email:'unclejose0@gmail.com',provider:'google'},{email:'markjohnsonbanatao888@gmail.com',provider:'google'}];
+const defaultState=()=>({goals:defaultGoals.map(g=>({...g})),events:[],currentFocus:'finance',mode:'today',override:null,theme:'dark',actionStarted:null});let state=defaultState();let editingId=null;let appUser=null;let remoteConnected=false;let sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};let emailWorkspace={providers:{},connections:[],signals:[]};let emailWorkspaceLoading=false;let emailScoreSignals=[];const requestedEmailAccounts=[{email:'joven_ong@hotmail.com',provider:'microsoft'},{email:'joven.ong23@gmail.com',provider:'google'},{email:'jovenongz@gmail.com',provider:'google'},{email:'unclejose0@gmail.com',provider:'google'},{email:'markjohnsonbanatao888@gmail.com',provider:'google'}];
 function load(){try{const raw=localStorage.getItem(STORE);if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.goals)&&parsed.goals.length){state={...defaultState(),...parsed,goals:parsed.goals};}}}catch(e){console.warn('Goal Compass local data could not be loaded.',e)}if(!state.goals.some(g=>g.id===state.currentFocus))state.currentFocus=state.goals[0]?.id||'build';}
 function save(){
   // Keep browser demo state separate from authenticated Supabase state; never overwrite a local demo with private-account data.
@@ -103,10 +103,19 @@ const weights={today:{importance:20,urgency:30,impact:20,momentum:20,confidence:
 function goalSignals(g){
   const ids=Array.isArray(g.linkedProjectIds)?g.linkedProjectIds:[];
   const since=Date.now()-7*24*60*60*1000;
+  const now=Date.now(),weekAhead=now+7*24*60*60*1000;
   const recentUserEvents=(state.events||[]).filter(e=>e.goalId===g.id&&Date.parse(e.at||'')>=since);
   const manualProgress=recentUserEvents.filter(e=>String(e.type||'').toLowerCase()==='progress').length;
   const manualBlockers=recentUserEvents.filter(e=>String(e.type||'').toLowerCase()==='blocker').length;
-  if(!remoteConnected||!ids.length)return {linkedProjectCount:0,openTasks:0,blockers:0,needsYou:0,recentEvents:0,recentCompletedTasks:0,manualProgress,manualBlockers,urgencyBoost:Math.min(2,manualBlockers*.5),momentumBoost:Math.min(1,manualProgress*.25)};
+  const linkedEmail=(emailScoreSignals||[]).filter(s=>s.goal_id===g.id&&s.review_state==='confirmed');
+  const dueDates=linkedEmail.map(s=>Date.parse(s.due_at||'')).filter(Number.isFinite);
+  const emailPastDue=linkedEmail.filter(s=>Number.isFinite(Date.parse(s.due_at||''))&&Date.parse(s.due_at)<now).length;
+  const emailDeadlinesSoon=linkedEmail.filter(s=>Number.isFinite(Date.parse(s.due_at||''))&&Date.parse(s.due_at)>=now&&Date.parse(s.due_at)<=weekAhead).length;
+  const emailReplies=linkedEmail.filter(s=>s.signal_type==='reply_needed').length;
+  const emailCommitments=linkedEmail.filter(s=>s.signal_type==='commitment').length;
+  const emailUrgencyBoost=Math.min(1.5,emailPastDue*1+(emailDeadlinesSoon*.6)+(emailReplies*.25));
+  const base={manualProgress,manualBlockers,emailSignals:linkedEmail.length,emailPastDue,emailDeadlinesSoon,emailReplies,emailCommitments,emailUrgencyBoost,momentumBoost:Math.min(1,manualProgress*.25)};
+  if(!remoteConnected||!ids.length)return {linkedProjectCount:0,openTasks:0,blockers:0,needsYou:0,recentEvents:0,recentCompletedTasks:0,...base,urgencyBoost:Math.min(2,manualBlockers*.5+emailUrgencyBoost)};
   const projects=(sourceSnapshot.projects.items||[]).filter(p=>ids.includes(p.id));
   const tasks=(sourceSnapshot.tasks.items||[]).filter(t=>ids.includes(t.project_id));
   const isDone=t=>['done','complete','completed','closed','cancelled','canceled','resolved'].includes(String(t.status||'').toLowerCase());
@@ -116,10 +125,10 @@ function goalSignals(g){
   const needsYou=(sourceSnapshot.experience.items||[]).filter(p=>ids.includes(p.project_id)&&p.needs_you===true).length;
   const recentEvents=(sourceSnapshot.externalEvents.items||[]).filter(e=>ids.includes(e.project_id)&&['processed','accepted','complete','completed'].includes(String(e.process_status||'').toLowerCase())&&Date.parse(e.received_at||e.external_created_at||'')>=since).length;
   const recentCompletedTasks=tasks.filter(t=>isDone(t)&&Date.parse(t.completed_at||'')>=since).length;
-  // Positive momentum comes from recently completed tasks and explicit user-logged progress, not event volume.
-  const urgencyBoost=Math.min(2,(needsYou?1.25:0)+(blockers.length?1.25:0)+manualBlockers*.5);
+  // Only confirmed email evidence explicitly linked to this goal can influence urgency.
+  const urgencyBoost=Math.min(3,(needsYou?1.25:0)+(blockers.length?1.25:0)+manualBlockers*.5+emailUrgencyBoost);
   const momentumBoost=Math.min(1,recentCompletedTasks*.35+manualProgress*.25);
-  return {linkedProjectCount:projects.length,openTasks:open.length,blockers:blockers.length,needsYou,recentEvents,recentCompletedTasks,manualProgress,manualBlockers,urgencyBoost,momentumBoost};
+  return {linkedProjectCount:projects.length,openTasks:open.length,blockers:blockers.length,needsYou,recentEvents,recentCompletedTasks,...base,urgencyBoost,momentumBoost};
 }
 function effectiveFactor(g,k){
   let v=Math.max(1,Math.min(5,Number(g[k])||1));
@@ -173,7 +182,7 @@ async function loadRemoteData(){
   state.override=settings&&settings.override_goal_id?{id:settings.override_goal_id,date:settings.override_date}:null;
   state.theme=settings&&settings.theme==='light'?'light':'dark';
   sourceSnapshot=data.sources||{syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};
-  appUser=data.user;remoteConnected=true;document.documentElement.dataset.theme=state.theme;$('#authModal').hidden=true;setConnectionLabel('Supabase connected',true);renderAll();
+  appUser=data.user;remoteConnected=true;document.documentElement.dataset.theme=state.theme;$('#authModal').hidden=true;setConnectionLabel('Supabase connected',true);await loadEmailScoreSignals();renderAll();
 }
 async function bootstrapSession(){
   try{const session=await fetch('/api/auth?action=session',{cache:'no-store',credentials:'same-origin'});const data=await session.json();if(data&&data.authenticated){await loadRemoteData();return;}setConnectionLabel('Local demo · not synced',false);}
@@ -193,12 +202,13 @@ function renderCompass(){const list=ranked(),rec=recommended();const focus=getGo
 const currentBearing=focus?Number(focus.direction)||0:0,targetBearing=rec?Number(rec.direction)||0:0;$('#needleCurrent').style.transform='translate(-50%,-100%) rotate('+currentBearing+'deg)';$('#needleTarget').style.transform='translate(-50%,-100%) rotate('+targetBearing+'deg)';$('#centerGoal').textContent=rec?rec.name:'ADD GOALS';$('#centerMeta').textContent=rec?scoreGoal(rec)+' · '+(rec.manualOverride?'MANUAL PRIORITY':'TOP SCORE'):'No active goals';$('#bearingPill').textContent=state.override&&overrideValid()?'Manual override':(appUser&&remoteConnected?'Live data':'Local demo');$('#currentBearing').textContent=focus?focus.name:'—';$('#targetBearing').textContent=rec?rec.name:'—';$('#courseError').textContent=focus&&rec?headingDiff(currentBearing,targetBearing)+'°':'—';$('#currentFocus').innerHTML=state.goals.map(g=>'<option value="'+escapeHTML(g.id)+'">'+escapeHTML(g.name)+(g.status!=='active'?' · '+escapeHTML(g.status):'')+'</option>').join('');$('#currentFocus').value=state.currentFocus||'';
 $('#recommendTitle').textContent=rec?rec.name:'No active goals';$('#recommendScore').textContent=rec?scoreGoal(rec):'—';$('#recommendRole').textContent=rec?(rec.manualOverride?'Manual priority':'Highest eligible score'):'Create an active goal';$('#recommendProgress').style.width=(rec?rec.progress:0)+'%';$('#recommendProgressText').textContent=(rec?rec.progress:0)+'% complete';$('#recommendConfidence').textContent=rec?'Input confidence '+(rec.confidence>=4?'high':rec.confidence>=3?'medium':'low'):'No evidence';$('#nextActionTitle').textContent=rec?rec.nextAction:'Add a goal to get started';$('#nextActionCopy').textContent=rec?(rec.manualOverride?'You set this as today’s priority. The score remains visible; your decision temporarily takes precedence.':'This is the next action attached to the highest-scoring active goal. Update the goal inputs as your real situation changes.'):'Use Goals to define your destinations and next actions.';$('#startAction').disabled=!rec;$('#setOverride').disabled=!rec;$('#setOverride').textContent=rec&&rec.manualOverride?'Manual priority active':'Make today’s priority';$('#scoreModeTag').textContent=({today:'Today',week:'This week',northstar:'North star'})[state.mode];
 const w=weights[state.mode];$('#scoreBreakdown').innerHTML=rec?Object.keys(w).map(k=>'<div class="evidence-item"><i class="bullet"></i><span>'+({importance:'Importance',urgency:'Urgency',impact:'Impact',momentum:'Momentum',confidence:'Evidence confidence'}[k])+'</span><b>'+effectiveFactor(rec,k).toFixed(effectiveFactor(rec,k)%1?1:0)+'/5 · '+Math.round((effectiveFactor(rec,k)/5)*w[k])+'</b></div>').join(''):'<div class="empty-state">No eligible goal yet. Create or activate a goal to calculate a recommendation.</div>';
-if(rec){const sig=goalSignals(rec);$('#scoreBreakdown').innerHTML+='<div class="evidence-item"><i class="bullet"></i><span>User-logged progress, last 7 days</span><b>'+sig.manualProgress+'</b></div><div class="evidence-item"><i class="bullet"></i><span>User-reported blockers, last 7 days</span><b>'+sig.manualBlockers+'</b></div>';if(sig.linkedProjectCount)$('#scoreBreakdown').innerHTML+='<div class="evidence-item"><i class="bullet"></i><span>Explicitly linked Pandora projects</span><b>'+sig.linkedProjectCount+'</b></div><div class="evidence-item"><i class="bullet"></i><span>Open tasks in linked projects</span><b>'+sig.openTasks+'</b></div><div class="evidence-item"><i class="bullet"></i><span>Blocking / needs-you signals</span><b>'+(sig.blockers+sig.needsYou)+'</b></div><div class="evidence-item"><i class="bullet"></i><span>Tasks completed in last 7 days</span><b>'+sig.recentCompletedTasks+'</b></div>'}
+if(rec){const sig=goalSignals(rec);$('#scoreBreakdown').innerHTML+='<div class="evidence-item"><i class="bullet"></i><span>User-logged progress, last 7 days</span><b>'+sig.manualProgress+'</b></div><div class="evidence-item"><i class="bullet"></i><span>User-reported blockers, last 7 days</span><b>'+sig.manualBlockers+'</b></div>';if(sig.linkedProjectCount)$('#scoreBreakdown').innerHTML+='<div class="evidence-item"><i class="bullet"></i><span>Explicitly linked Pandora projects</span><b>'+sig.linkedProjectCount+'</b></div><div class="evidence-item"><i class="bullet"></i><span>Open tasks in linked projects</span><b>'+sig.openTasks+'</b></div><div class="evidence-item"><i class="bullet"></i><span>Blocking / needs-you signals</span><b>'+(sig.blockers+sig.needsYou)+'</b></div><div class="evidence-item"><i class="bullet"></i><span>Tasks completed in last 7 days</span><b>'+sig.recentCompletedTasks+'</b></div>';if(sig.emailSignals)$('#scoreBreakdown').innerHTML+='<div class="evidence-item"><i class="bullet"></i><span>Confirmed email signals linked to goal</span><b>'+sig.emailSignals+'</b></div><div class="evidence-item"><i class="bullet"></i><span>Email deadlines overdue / next 7 days</span><b>'+sig.emailPastDue+' / '+sig.emailDeadlinesSoon+'</b></div><div class="evidence-item"><i class="bullet"></i><span>Confirmed email reply requests</span><b>'+sig.emailReplies+'</b></div><div class="evidence-item"><i class="bullet"></i><span>Urgency from confirmed email signals</span><b>+'+sig.emailUrgencyBoost.toFixed(1)+'</b></div>'}
 const events=state.events.slice(0,2);const sourceSummary=[];
 if(remoteConnected){
   sourceSummary.push('<div class="evidence-item"><i class="bullet"></i><span>Pandora projects visible to this account</span><b>'+((sourceSnapshot.projects&&sourceSnapshot.projects.items)||[]).length+'</b></div>');
   sourceSummary.push('<div class="evidence-item"><i class="bullet"></i><span>Project tasks readable under current permissions</span><b>'+((sourceSnapshot.tasks&&sourceSnapshot.tasks.items)||[]).length+'</b></div>');
   sourceSummary.push('<div class="evidence-item"><i class="bullet"></i><span>Promoted project lessons available</span><b>'+((sourceSnapshot.lessons&&sourceSnapshot.lessons.items)||[]).length+'</b></div>');
+  sourceSummary.push('<div class="evidence-item"><i class="bullet"></i><span>Confirmed email signals linked to goals</span><b>'+emailScoreSignals.length+'</b></div>');
   const processed=(sourceSnapshot.externalEvents&&sourceSnapshot.externalEvents.items||[]).filter(e=>['processed','accepted','complete','completed'].includes(String(e.process_status||'').toLowerCase())).length;
   sourceSummary.push('<div class="evidence-item"><i class="bullet"></i><span>Processed integration events in the latest sample</span><b>'+processed+'</b></div>');
   sourceSummary.push('<p class="muted-copy">Source snapshot: '+(sourceSnapshot.syncedAt?new Date(sourceSnapshot.syncedAt).toLocaleString():'not reported')+'. Empty results can mean no records are visible under this account’s RLS permissions.</p>');
@@ -243,6 +253,11 @@ function renderActivity(){const goalSel=$('#activityGoal');const val=goalSel.val
 function resetAll(){if(appUser){alert('Demo reset is disabled while your account is connected. Edit or delete your saved goals instead.');return;}if(!confirm('Reset all local Goal Compass data to the illustrative starting goals? This clears the activity log and manual override.'))return;state=defaultState();save();closeEditor();renderAll();setView('compass');}
 function renderAll(){document.documentElement.dataset.theme=state.theme==='light'?'light':'dark';$$('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===state.mode)));$('#resetDemo').disabled=!!appUser;$('#resetDemo').title=appUser?'Demo reset is disabled for account data':'Reset illustrative local demo data';renderCompass();renderGoals();renderActivity();}
 
+async function loadEmailScoreSignals(){
+  if(!appUser||!remoteConnected){emailScoreSignals=[];return;}
+  try{const data=await apiRequest('/api/email?action=score-context');emailScoreSignals=Array.isArray(data.signals)?data.signals:[];}
+  catch(e){emailScoreSignals=[];}
+}
 async function loadEmailWorkspace(){
   if(!appUser||!remoteConnected){emailWorkspace={providers:{},connections:[],signals:[]};renderConnections();return;}
   if(emailWorkspaceLoading)return;
@@ -331,7 +346,7 @@ function chooseAuthMode(mode){
 async function signOutAccount(){
   try{await fetch('/api/auth',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'signout'})});}
   catch(e){setConnectionLabel('Sign-out uncertain',false);return;}
-  appUser=null;remoteConnected=false;emailWorkspace={providers:{},connections:[],signals:[]};emailWorkspaceLoading=false;state=defaultState();load();sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};
+  appUser=null;remoteConnected=false;emailWorkspace={providers:{},connections:[],signals:[]};emailWorkspaceLoading=false;emailScoreSignals=[];state=defaultState();load();sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};
   renderAll();renderConnections();setView('compass');setConnectionLabel('Local demo · not synced',false);
 }
 $('#accountButton').addEventListener('click',()=>{if(appUser){signOutAccount();return;}$('#authModal').hidden=false;chooseAuthMode('signin');$('#authEmail').focus();});
