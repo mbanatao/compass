@@ -35,7 +35,8 @@ const fakeServer = {
     dbCalls.push({ accessToken, route });
     const table = route.split("?")[0];
     const params = new URLSearchParams(route.split("?")[1] || "");
-    assert.ok(params.get("select"), "every export query must explicitly select columns");
+    assert.ok(params.get("select"), "every export query must specify a projection");
+    assert.notEqual(params.get("select"), "*", "export queries must use explicit column allowlists");
     assert.equal(params.get("user_id"), "eq.user-123", "every export query must be scoped to the signed-in user");
     assert.doesNotMatch(params.get("select"), /token_ciphertext|provider_subject/, "export query must omit stored provider credentials and internal identity keys");
     const rows = {
