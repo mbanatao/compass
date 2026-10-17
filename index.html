@@ -18,7 +18,7 @@ html[data-theme="light"]{color-scheme:light;--bg:#f1efe8;--surface:#faf9f5;--sur
 @media(max-width:370px){.nav-item{min-width:55px;padding:0 5px}.nav-item .nav-icon{display:none}.bearing-cell b{font-size:13px}.goal-node{width:66px}.goal-node .node-name{font-size:11px}.dial-center{width:88px;height:88px}.dial-center strong{font-size:14px}.mode-switch button{padding:7px 8px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
-.connections-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.today-date-panel{border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:140px;background:var(--surface)}.today-date-panel strong{display:block;font-family:Georgia,serif;font-weight:400;font-size:18px}.today-date-panel span{display:block;color:var(--muted);font-size:9px;margin-top:4px;line-height:1.4}.daily-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:23px}.daily-stat{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface)}.daily-stat b{display:block;font-family:Georgia,serif;font-size:24px;font-weight:400}.daily-stat span{display:block;color:var(--muted);font-size:9px;margin-top:3px}.daily-plan-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.daily-plan-card{border:1px solid var(--line);border-radius:12px;padding:15px;background:var(--surface);min-width:0;display:flex;flex-direction:column;gap:10px}.daily-plan-card.is-priority{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));background:linear-gradient(145deg,var(--accent-wash),var(--surface) 65%)}.daily-plan-card .daily-card-top{display:flex;justify-content:space-between;align-items:start;gap:9px}.daily-plan-card .daily-card-top h3{font-size:15px;font-weight:500;margin:4px 0 0;overflow-wrap:anywhere}.daily-plan-card .daily-rank{font-family:Georgia,serif;font-size:22px;color:var(--accent)}.daily-plan-card .daily-score{color:var(--muted);font-size:9px}.daily-plan-card .daily-next{font-size:12px;line-height:1.5}.daily-plan-card .daily-why{font-size:10px;line-height:1.55;color:var(--muted);border-top:1px solid var(--line);padding-top:9px;flex:1}.daily-plan-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.daily-plan-actions .secondary-btn{font-size:10px;padding:0 7px}.daily-plan-actions [data-daily-action="later"]{grid-column:1/-1;min-height:32px}.daily-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:13px;margin-top:20px;align-items:start}.daily-form{display:grid;gap:11px;margin-top:14px}.daily-form .field textarea{min-height:62px}.daily-form .daily-form-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.daily-checkin-status{margin-top:10px;font-size:10px;line-height:1.5;color:var(--muted)}.weekly-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.weekly-metric{border:1px solid var(--line);border-radius:10px;padding:13px;background:var(--surface)}.weekly-metric strong{display:block;font-family:Georgia,serif;font-size:27px;font-weight:400}.weekly-metric span{display:block;font-size:9px;color:var(--muted);margin-top:3px}.weekly-review-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}.weekly-review-item{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:11px 0;font-size:11px}.weekly-review-item:first-child{border-top:0}.weekly-review-item p{margin:3px 0 0;color:var(--muted);font-size:10px;line-height:1.45}.weekly-review-item b{font-weight:500;white-space:nowrap}.daily-empty{grid-column:1/-1}.daily-form .field input,.daily-form .field select,.daily-form .field textarea{font-size:12px}@media(max-width:950px){.daily-plan-grid{grid-template-columns:1fr}.daily-plan-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}.daily-plan-card .daily-card-top{grid-column:1/-1}.daily-plan-card .daily-next,.daily-plan-card .daily-why{grid-column:1/-1}.daily-plan-actions{grid-column:1/-1;grid-template-columns:1fr 1fr 1fr}.daily-plan-actions [data-daily-action="later"]{grid-column:auto}.daily-layout{grid-template-columns:1fr}}@media(max-width:700px){.today-date-panel{margin-top:13px}.daily-stats,.weekly-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.daily-layout,.weekly-review-grid{grid-template-columns:1fr}.daily-plan-actions{grid-template-columns:1fr 1fr}.daily-plan-actions [data-daily-action="later"]{grid-column:1/-1}.daily-form .daily-form-pair{grid-template-columns:1fr}}.connections-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .email-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px;min-width:0}
 .email-card-head{display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .email-card h3{font-size:13px;font-weight:500;margin:3px 0}
@@ -52,15 +52,37 @@ html[data-theme="light"]{color-scheme:light;--bg:#f1efe8;--surface:#faf9f5;--sur
 <section class="auth-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
 <div class="eyebrow">Private data connection</div><h2 id="authTitle">Connect your compass.</h2>
 <p>Sign in to sync your goals across devices and read Pandora project signals permitted by your account. Browser-local demo data is not merged automatically.</p>
-<div class="auth-tabs" role="tablist" aria-label="Account mode"><button type="button" data-auth-mode="signin" aria-selected="true">Sign in</button><button type="button" data-auth-mode="signup" aria-selected="false">Create account</button></div>
+<div class="auth-tabs" id="authTabs" role="tablist" aria-label="Account mode"><button type="button" data-auth-mode="signin" aria-selected="true">Sign in</button><button type="button" data-auth-mode="signup" aria-selected="false">Create account</button></div>
 <form id="authForm"><div class="field"><label for="authEmail">Email address</label><input id="authEmail" name="email" type="email" autocomplete="email" maxlength="254" required></div><div class="field"><label for="authPassword">Password</label><input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="256" required></div><div class="auth-actions"><button type="submit" class="primary-btn full" id="authSubmit">Sign in securely</button></div></form>
-<p class="auth-message" id="authMessage" role="status" aria-live="polite"></p><div class="auth-actionbar"><button type="button" class="text-link" id="authCancel">Continue with local demo</button><button type="button" class="text-link" id="authClose">Close</button></div>
+<button type="button" class="text-link" id="forgotPassword">Forgot password?</button>
+<div class="recovery-panel" id="recoveryRequestPanel" hidden><p>Enter your sign-in email. For privacy, the response is the same whether or not an account exists for that address.</p><form id="recoveryRequestForm"><div class="field"><label for="recoveryEmail">Email address</label><input id="recoveryEmail" type="email" autocomplete="email" maxlength="254" required></div><button type="submit" class="primary-btn full" id="recoveryRequestSubmit">Send reset email</button><button type="button" class="text-link" id="recoveryBackRequest">Back to sign in</button></form></div>
+<div class="recovery-panel" id="recoveryUpdatePanel" hidden><p>Choose a new password for your Compass account. Reset links expire and can only be used with the account that requested them.</p><form id="recoveryUpdateForm"><div class="field"><label for="recoveryNewPassword">New password</label><input id="recoveryNewPassword" type="password" autocomplete="new-password" minlength="8" maxlength="256" required></div><div class="field"><label for="recoveryConfirmPassword">Confirm new password</label><input id="recoveryConfirmPassword" type="password" autocomplete="new-password" minlength="8" maxlength="256" required></div><button type="submit" class="primary-btn full" id="recoveryUpdateSubmit">Update password</button></form></div>
+<p class="auth-message" id="authMessage" role="status" aria-live="polite"></p><div class="auth-actionbar" id="authActionbar"><button type="button" class="text-link" id="authCancel">Continue with local demo</button><button type="button" class="text-link" id="authClose">Close</button></div>
 <p class="auth-note">Sessions use secure, HttpOnly cookies. Supabase keys remain on the server. Your goals are private to your account by row-level security.</p>
 </section></div>
 <div class="shell">
-<aside class="rail"><div><div class="rail-caption">Navigation</div><nav class="nav-list" aria-label="Main navigation"><button type="button" class="nav-item" data-view="compass" aria-current="page"><span class="nav-icon">◎</span>Compass</button><button type="button" class="nav-item" data-view="goals"><span class="nav-icon">◇</span>Goals</button><button type="button" class="nav-item" data-view="activity"><span class="nav-icon">↗</span>Activity</button><button type="button" class="nav-item" data-view="connections"><span class="nav-icon">⌁</span>Connections</button><button type="button" class="nav-item" data-view="method"><span class="nav-icon">≋</span>Method</button></nav></div><div class="rail-bottom"><div class="sync-state"><span class="dot"></span><span>Saved on this device</span></div><p>Sign in to sync private goals and activity. External accounts connect only after you authorize them.</p></div></aside>
+<aside class="rail"><div><div class="rail-caption">Navigation</div><nav class="nav-list" aria-label="Main navigation"><button type="button" class="nav-item" data-view="today" aria-current="page"><span class="nav-icon">◷</span>Today</button><button type="button" class="nav-item" data-view="compass"><span class="nav-icon">◎</span>Compass</button><button type="button" class="nav-item" data-view="goals"><span class="nav-icon">◇</span>Goals</button><button type="button" class="nav-item" data-view="activity"><span class="nav-icon">↗</span>Activity</button><button type="button" class="nav-item" data-view="review"><span class="nav-icon">▤</span>Review</button><button type="button" class="nav-item" data-view="connections"><span class="nav-icon">⌁</span>Connections</button><button type="button" class="nav-item" data-view="method"><span class="nav-icon">≋</span>Method</button></nav></div><div class="rail-bottom"><div class="sync-state"><span class="dot"></span><span>Saved on this device</span></div><p>Sign in to sync private goals and activity. External accounts connect only after you authorize them.</p></div></aside>
 <main class="main">
-<section class="page active" id="page-compass" data-page="compass">
+<section class="page active" id="page-today" data-page="today">
+<div class="page-head"><div><div class="eyebrow">Daily command center</div><h1>Make today count.</h1><p class="head-copy">Three useful next moves, grounded in your active goals and the evidence you have chosen to connect. You make the final call.</p></div><div class="today-date-panel"><strong id="todayDate">Today</strong><span id="todayDataStatus">Local demo · not synced</span></div></div>
+<div class="daily-stats" id="todayStats" aria-live="polite"></div>
+<div class="section-row"><div><div class="eyebrow">Your next moves</div><h2>Suggested priorities</h2></div><button type="button" class="text-link" data-go-view="goals">Adjust goals ↗</button></div>
+<div class="daily-plan-grid" id="dailyPlan" aria-live="polite"><div class="compact-panel daily-empty"><div class="empty-state">Preparing your daily plan…</div></div></div>
+<div class="daily-layout">
+<section class="compact-panel"><div class="eyebrow">Quick reflection</div><h2 style="margin-top:5px">Check in with yourself.</h2><p class="muted-copy">This is self-reported context, not passive tracking. If you select a goal and enter a blocker, Compass records a separate blocker event that can raise that goal’s urgency. Energy and available time alone do not change scores.</p>
+<form class="daily-form" id="dailyCheckinForm">
+<div class="daily-form-pair"><div class="field"><label for="checkinEnergy">Energy today</label><select id="checkinEnergy"><option value="1">1 · Very low</option><option value="2">2 · Low</option><option value="3" selected>3 · Steady</option><option value="4">4 · Good</option><option value="5">5 · Excellent</option></select></div><div class="field"><label for="checkinCapacity">Time available for focused work</label><select id="checkinCapacity"><option value="30 minutes">30 minutes</option><option value="1 hour" selected>1 hour</option><option value="2 hours">2 hours</option><option value="4 hours">4 hours</option><option value="6+ hours">6+ hours</option></select></div></div>
+<div class="field"><label for="checkinGoal">Goal this check-in relates to (optional)</label><select id="checkinGoal"><option value="">No specific goal</option></select></div>
+<div class="field"><label for="checkinFocus">What deserves your attention today? (optional)</label><textarea id="checkinFocus" maxlength="100" placeholder="A priority or constraint worth remembering today…"></textarea></div>
+<div class="field"><label for="checkinWin">One win or progress point (optional)</label><textarea id="checkinWin" maxlength="100" placeholder="What has already moved forward?"></textarea></div>
+<div class="field"><label for="checkinBlocker">What might block you? (optional)</label><textarea id="checkinBlocker" maxlength="100" placeholder="A specific obstacle you can plan around…"></textarea></div>
+<button type="submit" class="primary-btn" id="saveDailyCheckin">Save today’s check-in</button></form>
+<div class="daily-checkin-status" id="dailyCheckinStatus" role="status" aria-live="polite">No check-in recorded today.</div></section>
+<aside class="compact-panel"><div class="eyebrow">Evidence boundary</div><h2 style="margin-top:5px">Recommendations, not commands.</h2><div class="evidence-list" id="dailyEvidenceNotes"></div><p class="muted-copy">Scores remain deterministic. Email can affect urgency only after you confirm a signal and link it to a goal. A check-in records your words; it does not automatically prove completion.</p><div style="margin-top:14px"><button type="button" class="secondary-btn full" data-go-view="connections">Review connected sources</button></div></aside>
+</div>
+<div class="toast" id="dailyToast" role="status" aria-live="polite"></div>
+</section>
+<section class="page" id="page-compass" data-page="compass">
 <div class="page-head"><div><div class="eyebrow" id="todayLabel">PERSONAL NAVIGATION</div><h1>Find your direction.</h1><p class="head-copy">See which goal deserves your attention, compare it with your current focus, and choose a concrete next move.</p></div><div class="mode-switch" role="group" aria-label="Scoring horizon"><button type="button" data-mode="today" aria-pressed="true">Today</button><button type="button" data-mode="week" aria-pressed="false">This week</button><button type="button" data-mode="northstar" aria-pressed="false">North star</button></div></div>
 <div class="compass-grid">
 <div class="instrument-panel"><div class="instrument-top"><span class="eyebrow">Priority field / 4 bearings</span><span class="state-pill"><span class="dot"></span><span id="bearingPill">Ready</span></span></div><div class="dial-wrap"><div class="dial" id="dial" aria-label="Goal compass. Select a goal around the dial to inspect it."><div class="dial-axis-v"></div><div class="dial-axis-h"></div><span class="degree-label degree-0">000°</span><span class="degree-label degree-90">090°</span><span class="degree-label degree-180">180°</span><span class="degree-label degree-270">270°</span><button class="goal-node node-n" type="button" data-direction="0" data-goal="build"><span class="node-dir">North · 000°</span><span class="node-name">BUILD</span><span class="node-score">—</span></button><button class="goal-node node-e" type="button" data-direction="90" data-goal="health"><span class="node-dir">East · 090°</span><span class="node-name">HEALTH</span><span class="node-score">—</span></button><button class="goal-node node-s" type="button" data-direction="180" data-goal="finance"><span class="node-dir">South · 180°</span><span class="node-name">FINANCE</span><span class="node-score">—</span></button><button class="goal-node node-w" type="button" data-direction="270" data-goal="people"><span class="node-dir">West · 270°</span><span class="node-name">PEOPLE</span><span class="node-score">—</span></button><div class="needle needle-current" id="needleCurrent"></div><div class="needle needle-target" id="needleTarget"></div><div class="dial-center"><span class="center-kicker">Recommended</span><strong id="centerGoal">BUILD</strong><span id="centerMeta">Priority pending</span></div></div></div><div class="needle-legend"><span><i class="legend-mark"></i>Recommended direction</span><span><i class="legend-mark current"></i>Current focus</span></div><div class="bearing-readout"><div class="bearing-cell"><span>Current focus</span><b id="currentBearing">FINANCE</b></div><div class="bearing-cell"><span>Recommended</span><b id="targetBearing">BUILD</b></div><div class="bearing-cell"><span>Difference</span><b id="courseError">180°</b></div></div></div>
@@ -70,7 +92,13 @@ html[data-theme="light"]{color-scheme:light;--bg:#f1efe8;--surface:#faf9f5;--sur
 </section>
 <section class="page" id="page-goals" data-page="goals"><div class="page-head"><div><div class="eyebrow">Your destinations</div><h1>Goals, made concrete.</h1><p class="head-copy">Edit what each direction means, what progress looks like, and how strongly it should compete for your attention.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="primary-btn" id="newGoal">Create goal</button><button type="button" class="secondary-btn" id="resetDemo">Reset demo data</button></div></div><div class="goal-list" id="goalList"></div><section class="goal-editor" id="goalEditor"><div class="section-row" style="margin-top:0"><div><div class="eyebrow">Edit destination</div><h2 id="editorTitle">Goal details</h2></div><button type="button" class="icon-button" id="closeEditor" aria-label="Close goal editor">×</button></div><form id="goalForm"><input type="hidden" id="editGoalId"><div class="form-grid"><div class="field"><label for="editName">Goal name</label><input id="editName" maxlength="35" required></div><div class="field"><label for="editDirection">Compass direction</label><select id="editDirection"><option value="0">North · 000°</option><option value="90">East · 090°</option><option value="180">South · 180°</option><option value="270">West · 270°</option></select></div><div class="field wide"><label for="editDescription">What does success mean?</label><textarea id="editDescription" maxlength="280" required></textarea></div><div class="field wide"><label for="editNextAction">Next action</label><input id="editNextAction" maxlength="120" required></div><div class="field wide"><label for="editLinkedProjects">Linked Pandora projects (optional)</label><select id="editLinkedProjects" multiple size="4" aria-describedby="linkedProjectsHelp"></select><p class="muted-copy" id="linkedProjectsHelp">Only projects visible through your signed-in Supabase account are listed. Explicitly link a project so its tasks and verified activity can influence this goal.</p></div><div class="field"><label for="editDeadline">Target date (optional)</label><input id="editDeadline" type="date"></div><div class="field"><label for="editStatus">Status</label><select id="editStatus"><option value="active">Active</option><option value="paused">Paused</option><option value="completed">Completed</option></select></div><div class="field"><div class="range-label"><label for="editImportance">Importance</label><output id="importanceValue">5 / 5</output></div><input id="editImportance" type="range" min="1" max="5" value="5"></div><div class="field"><div class="range-label"><label for="editUrgency">Urgency</label><output id="urgencyValue">4 / 5</output></div><input id="editUrgency" type="range" min="1" max="5" value="4"></div><div class="field"><div class="range-label"><label for="editImpact">Impact</label><output id="impactValue">5 / 5</output></div><input id="editImpact" type="range" min="1" max="5" value="5"></div><div class="field"><div class="range-label"><label for="editMomentum">Momentum</label><output id="momentumValue">4 / 5</output></div><input id="editMomentum" type="range" min="1" max="5" value="4"></div><div class="field"><div class="range-label"><label for="editConfidence">Evidence confidence</label><output id="confidenceValue">4 / 5</output></div><input id="editConfidence" type="range" min="1" max="5" value="4"></div><div class="field"><div class="range-label"><label for="editProgress">Progress</label><output id="progressValue">58%</output></div><input id="editProgress" type="range" min="0" max="100" value="58"></div></div><div class="editor-actions"><button type="button" class="danger-btn" id="deleteGoal">Delete goal</button><div style="display:flex;gap:8px"><button type="button" class="secondary-btn" id="cancelEditor">Cancel</button><button type="submit" class="primary-btn">Save goal</button></div></div></form></section></section>
 <section class="page" id="page-activity" data-page="activity"><div class="page-head"><div><div class="eyebrow">Evidence, not surveillance</div><h1>Activity & course.</h1><p class="head-copy">Log what you actually worked on, record decisions, and review the events the compass has seen. Nothing is captured automatically in this version.</p></div></div><div class="activity-grid"><div class="panel"><div class="compact-head"><h2>Recent activity</h2><button type="button" class="text-link" id="clearActivity">Clear history</button></div><div class="activity-list" id="activityList"></div></div><div class="panel"><div class="panel-label">Add an event</div><h2 style="margin:5px 0 15px">Record a signal.</h2><form class="activity-form" id="activityForm"><div class="field"><label for="activityGoal">Related goal</label><select id="activityGoal"></select></div><div class="field"><label for="activityType">Event type</label><select id="activityType"><option value="Progress">Progress made</option><option value="Decision">Decision</option><option value="Blocker">Blocker found</option><option value="Insight">Lesson / insight</option><option value="Check-in">Check-in</option></select></div><div class="field"><label for="activityNote">What happened?</label><textarea id="activityNote" maxlength="500" placeholder="Describe the meaningful change, result, or blocker…" required></textarea></div><div class="field"><label for="activityMinutes">Time invested (minutes, optional)</label><input id="activityMinutes" type="number" min="0" max="1440" placeholder="e.g. 45"></div><button class="primary-btn" type="submit">Log activity</button><p class="muted-copy">Logging an event does not automatically turn it into permanent memory or increase a score. Edit goal momentum and confidence deliberately.</p></form></div></div></section>
-<section class="page" id="page-method"><div class="page-head"><div><div class="eyebrow">Transparent by design</div><h1>A compass with reasons.</h1><p class="head-copy">The priority engine is deterministic and inspectable. AI can explain results later, but it should not invent the scoring truth.</p></div></div><div class="method-grid"><div class="method-card"><div class="eyebrow">01 / Score</div><h3>Weighted, deterministic priority</h3><div class="formula" id="formulaText">Importance × weight<br>Urgency × weight<br>Impact × weight<br>Momentum × weight<br>Evidence confidence × weight</div><p>Each input is scored from 1 to 5. Each planning horizon changes the weights; scores are normalized to 100. Paused and completed goals are excluded from the recommendation.</p></div><div class="method-card"><div class="eyebrow">02 / Recommend</div><h3>Choose the highest eligible goal</h3><p>The engine sorts eligible goals by score. A user-created “today priority” override wins until the end of the local day, and the interface labels it as a manual decision.</p><ul><li>Show the score and input breakdown.</li><li>Explain deadline or blocker signals.</li><li>Keep user overrides distinguishable from calculated recommendations.</li></ul></div><div class="method-card"><div class="eyebrow">03 / Learn</div><h3>Keep evidence quality intact</h3><p>Activity is a raw event log. A repeated observation should only become a durable lesson after validation. Email-derived signals use transparent heuristics, save minimal metadata rather than full message bodies, and require your review.</p><div class="notice">Future integrations can read project/task/calendar sources and a bounded, provenance-aware Memory context. Missing or stale inputs should reduce confidence instead of being silently guessed.</div></div><div class="method-card"><div class="eyebrow">04 / Current limits</div><h3>What this version does not claim</h3><ul><li>It does not know your actual work unless you log it.</li><li>It does not read phone orientation sensors.</li><li>Only signed-in sessions sync private goals and activity to Supabase; local demo data remains browser-local.</li><li>Email reading requires a configured provider app and separate consent for each mailbox. Pandora Memory, calendar, finance, and phone sensors remain separate integrations.</li></ul><p>The visual bearing compares the goal direction you selected with the direction recommended by the scoring engine. It is not GPS, a physical compass, or a measurement of your behavior.</p></div></div></section>
+<section class="page" id="page-review" data-page="review">
+<div class="page-head"><div><div class="eyebrow">Reflect, then recalibrate</div><h1>Your week in review.</h1><p class="head-copy">A factual summary of what you logged in the last seven days. Missing records mean missing records—not proof that nothing happened.</p></div><button type="button" class="secondary-btn" data-go-view="activity">Log an update ↗</button></div>
+<div class="weekly-metrics" id="weeklyMetrics" aria-live="polite"></div>
+<div class="weekly-review-grid"><section class="compact-panel"><div class="eyebrow">Attention and follow-through</div><h2 style="margin-top:5px">What the record shows</h2><div id="weeklyHighlights" class="evidence-list"></div></section><section class="compact-panel"><div class="eyebrow">Last seven days</div><h2 style="margin-top:5px">Recent activity</h2><div id="weeklyActivity" style="margin-top:9px"></div></section></div>
+<div class="notice" style="margin-top:16px">This review measures recorded events and time entries only. It does not infer how productive, healthy, or successful you were. Use it to correct the record and choose what should change next week.</div>
+</section>
+<section class="page" id="page-method"><div class="page-head"><div><div class="eyebrow">Transparent by design</div><h1>A compass with reasons.</h1><p class="head-copy">The priority engine is deterministic and inspectable. AI can explain results later, but it should not invent the scoring truth.</p></div></div><div class="method-grid"><div class="method-card"><div class="eyebrow">01 / Score</div><h3>Weighted, deterministic priority</h3><div class="formula" id="formulaText">Importance × weight<br>Urgency × weight<br>Impact × weight<br>Momentum × weight<br>Evidence confidence × weight</div><p>Each input is scored from 1 to 5. Each planning horizon changes the weights; scores are normalized to 100. Paused and completed goals are excluded from the recommendation.</p></div><div class="method-card"><div class="eyebrow">02 / Recommend</div><h3>Choose the highest eligible goal</h3><p>The engine sorts eligible goals by score. A user-created “today priority” override wins until the end of the local day, and the interface labels it as a manual decision.</p><ul><li>Show the score and input breakdown.</li><li>Explain deadline or blocker signals.</li><li>Keep user overrides distinguishable from calculated recommendations.</li></ul></div><div class="method-card"><div class="eyebrow">03 / Learn</div><h3>Keep evidence quality intact</h3><p>Activity is a raw event log. A repeated observation should only become a durable lesson after validation. Email-derived signals use transparent heuristics, save minimal metadata rather than full message bodies, and require your review.</p><div class="notice">Future integrations can read project/task/calendar sources and a bounded, provenance-aware Memory context. Missing or stale inputs should reduce confidence instead of being silently guessed.</div></div><div class="method-card"><div class="eyebrow">04 / Current limits</div><h3>What this version does not claim</h3><ul><li>It does not know your actual work unless you log it.</li><li>It does not read phone orientation sensors.</li><li>Only signed-in sessions sync private goals and activity to Supabase; local demo data remains browser-local.</li><li>Email reading requires a configured provider app and separate consent for each mailbox. Pandora Memory, calendar, finance, and phone sensors remain separate integrations.</li></ul><p>The visual bearing compares the goal direction you selected with the direction recommended by the scoring engine. It is not GPS, a physical compass, or a measurement of your behavior.</p></div></div><div class="compact-panel privacy-tools" style="margin-top:14px"><div class="eyebrow">Your data / export</div><h2 style="margin-top:5px">Keep a copy of your Compass data.</h2><p class="muted-copy">Download goals, activity history, preferences, linked project context visible to this account, and email signal metadata. Provider refresh tokens and server secrets are never included. Local demo exports contain only browser-local demo data.</p><button type="button" class="secondary-btn" id="exportDataButton">Export my data as JSON</button><p class="daily-checkin-status" id="exportDataStatus" role="status" aria-live="polite">Export runs in this browser when you request it.</p></div></section>
 
 <section class="page" id="page-connections" data-page="connections">
   <div class="page-head"><div><div class="eyebrow">External accounts / read only</div><h1>Connect your context.</h1><p class="head-copy">Authorize the mailboxes you want Compass to read. Each account is verified against the address you select. Compass reads recent inbox metadata and short previews to suggest possible replies, deadlines, and follow-ups; it never sends email.</p></div></div>
@@ -91,7 +119,7 @@ const defaultGoals=[
 {id:'finance',name:'FINANCE',direction:180,description:'Keep cash flow, obligations, and business economics visible.',nextAction:'Review the highest-value open financial loop.',importance:4,urgency:4,impact:4,momentum:3,confidence:3,progress:42,status:'active',deadline:''},
 {id:'people',name:'PEOPLE',direction:270,description:'Maintain the relationships and trust that matter over the long term.',nextAction:'Reach out to one important person.',importance:3,urgency:2,impact:4,momentum:3,confidence:4,progress:70,status:'active',deadline:''}
 ];
-const defaultState=()=>({goals:defaultGoals.map(g=>({...g})),events:[],currentFocus:'finance',mode:'today',override:null,theme:'dark',actionStarted:null});let state=defaultState();let editingId=null;let appUser=null;let remoteConnected=false;let sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};let emailWorkspace={providers:{},connections:[],signals:[]};let emailWorkspaceLoading=false;let emailScoreSignals=[];const requestedEmailAccounts=[{email:'joven_ong@hotmail.com',provider:'microsoft'},{email:'joven.ong23@gmail.com',provider:'google'},{email:'jovenongz@gmail.com',provider:'google'},{email:'unclejose0@gmail.com',provider:'google'},{email:'markjohnsonbanatao888@gmail.com',provider:'google'}];
+const defaultState=()=>({goals:defaultGoals.map(g=>({...g})),events:[],currentFocus:'finance',mode:'today',override:null,theme:'dark',actionStarted:null});let state=defaultState();let editingId=null;let appUser=null;let recoveryAccessToken=null;let remoteConnected=false;let sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};let emailWorkspace={providers:{},connections:[],signals:[]};let emailWorkspaceLoading=false;let emailScoreSignals=[];let emailScoreSignalsAvailable=false;let emailScoreSignalsSyncedAt=null;const requestedEmailAccounts=[{email:'joven_ong@hotmail.com',provider:'microsoft'},{email:'joven.ong23@gmail.com',provider:'google'},{email:'jovenongz@gmail.com',provider:'google'},{email:'unclejose0@gmail.com',provider:'google'},{email:'markjohnsonbanatao888@gmail.com',provider:'google'}];
 function load(){try{const raw=localStorage.getItem(STORE);if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.goals)&&parsed.goals.length){state={...defaultState(),...parsed,goals:parsed.goals};}}}catch(e){console.warn('Goal Compass local data could not be loaded.',e)}if(!state.goals.some(g=>g.id===state.currentFocus))state.currentFocus=state.goals[0]?.id||'build';}
 function save(){
   // Keep browser demo state separate from authenticated Supabase state; never overwrite a local demo with private-account data.
@@ -141,9 +169,12 @@ function effectiveFactor(g,k){
   if(k==='momentum')v+=signals.momentumBoost;
   return Math.min(5,v);
 }
-function scoreGoal(g){const w=weights[state.mode]||weights.today;return Math.round(Object.keys(w).reduce((sum,k)=>sum+(effectiveFactor(g,k)/5)*w[k],0));}
-function localDateKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function overrideValid(){return state.mode==='today'&&state.override&&state.override.date===localDateKey()&&state.goals.some(g=>g.id===state.override.id&&g.status==='active');}
+function scoreForHorizon(g,mode){const w=weights[mode]||weights.today;return Math.round(Object.keys(w).reduce((sum,k)=>sum+(effectiveFactor(g,k)/5)*w[k],0));}
+function scoreGoal(g){return scoreForHorizon(g,state.mode);}
+function localDateKeyFor(value){const d=value instanceof Date?value:new Date(value);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function localDateKey(){return localDateKeyFor(new Date());}
+function currentDayOverrideValid(){return !!(state.override&&state.override.date===localDateKey()&&state.goals.some(g=>g.id===state.override.id&&g.status==='active'));}
+function overrideValid(){return state.mode==='today'&&currentDayOverrideValid();}
 function ranked(){return state.goals.filter(g=>g.status==='active').map(g=>({...g,score:scoreGoal(g)})).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));}
 function recommended(){const list=ranked();if(overrideValid()){const o=list.find(g=>g.id===state.override.id);if(o)return {...o,manualOverride:true};}return list[0]||null;}
 function getGoal(id){return state.goals.find(g=>g.id===id)}function normalizeName(s){return String(s||'').trim().slice(0,35)}function escapeHTML(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -170,9 +201,9 @@ async function apiRequest(path,payload){
   return data;
 }
 async function persistSettings(){
-  if(!appUser||!remoteConnected)return;
-  try{await apiRequest('/api/compass',{action:'save_settings',currentFocusGoalId:getGoal(state.currentFocus)?state.currentFocus:null,planningHorizon:state.mode,overrideGoalId:state.override&&state.override.id||null,overrideDate:state.override&&state.override.date||null,theme:state.theme});}
-  catch(e){setConnectionLabel('Sync issue · retry',false);const toast=$('#compassToast');if(toast)toast.textContent='Settings were not synced: '+e.message;}
+  if(!appUser||!remoteConnected)return true;
+  try{await apiRequest('/api/compass',{action:'save_settings',currentFocusGoalId:getGoal(state.currentFocus)?state.currentFocus:null,planningHorizon:state.mode,overrideGoalId:state.override&&state.override.id||null,overrideDate:state.override&&state.override.date||null,theme:state.theme});return true;}
+  catch(e){setConnectionLabel('Sync issue · retry',false);const toast=$('#compassToast');if(toast)toast.textContent='Settings were not synced: '+e.message;return false;}
 }
 async function loadRemoteData(){
   const data=await apiRequest('/api/compass');const links=data.links||[];
@@ -189,7 +220,7 @@ async function bootstrapSession(){
   catch(e){setConnectionLabel('Local demo · backend unavailable',false);}
 }
 
-function setView(name){$('.page').forEach(p=>p.classList.toggle('active',p.dataset.page===name));$('.nav-item').forEach(b=>{if(b.dataset.view===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});if(name==='goals')renderGoals();if(name==='activity')renderActivity();if(name==='connections')loadEmailWorkspace();}
+function setView(name){$('.page').forEach(p=>p.classList.toggle('active',p.dataset.page===name));$('.nav-item').forEach(b=>{if(b.dataset.view===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});if(name==='today')renderToday();if(name==='review')renderWeeklyReview();if(name==='goals')renderGoals();if(name==='activity')renderActivity();if(name==='connections')loadEmailWorkspace();}
 function addEvent(goalId,type,note,minutes){
   const evt={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),goalId,type,note:String(note||'').trim().slice(0,500),minutes:Number.isFinite(Number(minutes))&&Number(minutes)>0?Math.min(1440,Math.round(Number(minutes))):null,at:new Date().toISOString()};
   state.events.unshift(evt);state.events=state.events.slice(0,100);save();
@@ -249,14 +280,88 @@ function openNewGoal(){
 }
 function closeEditor(){$('#goalEditor').classList.remove('open');editingId=null;}
 function updateRangeLabels(){for(const k of ['importance','urgency','impact','momentum','confidence'])$('#'+k+'Value').textContent=$('#edit'+k[0].toUpperCase()+k.slice(1)).value+' / 5';$('#progressValue').textContent=$('#editProgress').value+'%';}
-function renderActivity(){const goalSel=$('#activityGoal');const val=goalSel.value;goalSel.innerHTML=state.goals.map(g=>'<option value="'+escapeHTML(g.id)+'">'+escapeHTML(g.name)+'</option>').join('');if(getGoal(val))goalSel.value=val;const events=state.events;$('#activityList').innerHTML=events.length?events.map(e=>{const g=getGoal(e.goalId);return '<div class="activity-item"><div class="activity-time">'+escapeHTML(new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric'}).format(new Date(e.at)))+'<br>'+escapeHTML(new Date(e.at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}))+'</div><div><strong>'+escapeHTML(g?g.name:'Removed goal')+' · '+escapeHTML(e.type)+(e.minutes?' · '+e.minutes+' min':'')+'</strong><p>'+escapeHTML(e.note)+'</p></div><span class="activity-kind">USER LOGGED</span></div>';}).join(''):'<div class="empty-state">Nothing logged yet.<br>Add an activity event to give the compass more context.</div>';}
+function eventTypeKey(e){return String(e&&e.type||'').toLowerCase().replace(/[ _-]/g,'');}
+function displayEventNote(note){return String(note||'').replace(/^\[daily-check-in:[^\]]+\]\s*/,'').replace(/\s*\[compass-not-now:[^\]]+\]/g,'').trim();}
+function dismissedTodayGoalIds(){const today=localDateKey(),ids=new Set();(state.events||[]).forEach(e=>{const match=String(e.note||'').match(/\[compass-not-now:([^:\]]+):([^\]]+)\]/);if(match&&match[1]===today)ids.add(match[2]);});return ids;}
+function dailyRecommendations(){let list=state.goals.filter(g=>g.status==='active').map(g=>({...g,score:scoreForHorizon(g,'today')})).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name)),dismissed=dismissedTodayGoalIds();list=list.filter(g=>!dismissed.has(g.id));if(currentDayOverrideValid()){const index=list.findIndex(g=>g.id===state.override.id);if(index>0)list.unshift(list.splice(index,1)[0]);}return list.slice(0,3);}
+function goalWhyNow(g){
+  const reasons=[];const now=Date.now();
+  if(g.deadline){const due=new Date(g.deadline+'T23:59:59');if(!Number.isNaN(due.getTime())){const days=Math.ceil((due.getTime()-now)/86400000);if(days<0)reasons.push('Its target date passed '+Math.abs(days)+' day'+(Math.abs(days)===1?'':'s')+' ago; review the deadline or next step.');else if(days===0)reasons.push('Its target date is today.');else if(days<=3)reasons.push('Its target date is in '+days+' day'+(days===1?'':'s')+'.');else if(days<=7)reasons.push('Its target date is within the next week ('+days+' days).');}}
+  const sig=goalSignals(g);
+  if(sig.emailPastDue)reasons.push(sig.emailPastDue+' confirmed email-linked deadline'+(sig.emailPastDue===1?' is':'s are')+' overdue.');
+  else if(sig.emailDeadlinesSoon)reasons.push(sig.emailDeadlinesSoon+' confirmed email-linked deadline'+(sig.emailDeadlinesSoon===1?' is':'s are')+' due within seven days.');
+  if((sig.blockers||0)+(sig.needsYou||0)>0)reasons.push('A linked Pandora project has '+((sig.blockers||0)+(sig.needsYou||0))+' explicit blocker or needs-you signal'+(((sig.blockers||0)+(sig.needsYou||0))===1?'':'s')+'.');
+  if(sig.manualBlockers)reasons.push('You logged '+sig.manualBlockers+' blocker'+(sig.manualBlockers===1?'':'s')+' for this goal in the last seven days.');
+  if(sig.manualProgress)reasons.push('You logged '+sig.manualProgress+' progress update'+(sig.manualProgress===1?'':'s')+' for this goal in the last seven days.');
+  if(!reasons.length)reasons.push('Ranked from your current inputs: importance '+g.importance+'/5, urgency '+g.urgency+'/5, impact '+g.impact+'/5, momentum '+g.momentum+'/5, and evidence confidence '+g.confidence+'/5. No linked deadline or explicit blocker was found in the data available to Compass.');
+  return reasons.slice(0,2).join(' ');
+}
+function todayCheckinEvent(){const marker='[daily-check-in:'+localDateKey()+']';return (state.events||[]).filter(e=>eventTypeKey(e)==='checkin'&&String(e.note||'').includes(marker)).sort((a,b)=>Date.parse(b.at||'')-Date.parse(a.at||''))[0]||null;}
+function populateCheckinGoals(){const el=$('#checkinGoal');if(!el)return;const old=el.value;el.innerHTML='<option value="">No specific goal</option>'+state.goals.filter(g=>g.status==='active').map(g=>'<option value="'+escapeHTML(g.id)+'">'+escapeHTML(g.name)+'</option>').join('');if(state.goals.some(g=>g.id===old&&g.status==='active'))el.value=old;}
+function renderToday(){
+  const date=$('#todayDate');if(!date)return;
+  date.textContent=new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric'}).format(new Date());
+  $('#todayDataStatus').textContent=appUser&&remoteConnected?'Signed-in account · permissions apply':'Local demo · starter goals are examples';
+  const active=state.goals.filter(g=>g.status==='active').length;
+  const todayEvents=state.events.filter(e=>e.at&&localDateKeyFor(e.at)===localDateKey()).length;
+  const confirmed=(emailScoreSignals||[]).filter(s=>s.review_state==='confirmed'&&s.goal_id).length;
+  const checkin=todayCheckinEvent();
+  const stats=[{value:active,label:'Active goals'},{value:todayEvents,label:'Entries logged today'},{value:confirmed,label:'Confirmed goal-linked email signals'},{value:checkin?'Done':'Open',label:'Daily check-in'}];
+  $('#todayStats').innerHTML=stats.map(s=>'<div class="daily-stat"><b>'+escapeHTML(s.value)+'</b><span>'+escapeHTML(s.label)+'</span></div>').join('');
+  const plan=dailyRecommendations();
+  $('#dailyPlan').innerHTML=plan.length?plan.map((g,i)=>'<article class="daily-plan-card '+((i===0||currentDayOverrideValid()&&g.id===state.override.id)?'is-priority':'')+'"><div class="daily-card-top"><div><div class="eyebrow">Suggested move '+(i+1)+(overrideValid()&&g.id===state.override.id?' · Your choice':'')+'</div><h3>'+escapeHTML(g.name)+'</h3></div><div style="text-align:right"><div class="daily-rank">'+scoreForHorizon(g,'today')+'</div><div class="daily-score">/ 100</div></div></div><div><div class="panel-label">Next action</div><div class="daily-next">'+escapeHTML(g.nextAction||'Edit this goal to define a concrete next action.')+'</div></div><div class="daily-why"><strong style="color:var(--ink);font-weight:500">Why now?</strong> '+escapeHTML(goalWhyNow(g))+'</div><div class="daily-plan-actions"><button type="button" class="primary-btn" data-daily-action="focus" data-goal-id="'+escapeHTML(g.id)+'">Focus this</button><button type="button" class="secondary-btn" data-daily-action="start" data-goal-id="'+escapeHTML(g.id)+'">Start action</button><button type="button" class="secondary-btn" data-daily-action="later" data-goal-id="'+escapeHTML(g.id)+'">Not now · hide until tomorrow</button></div></article>').join(''):'<div class="compact-panel daily-empty"><div class="eyebrow">No recommendations available</div><h3 style="margin:8px 0">Your plan needs an active goal.</h3><p class="muted-copy">Create or activate a goal. If you deferred every suggestion, you can also review Goals and revise your priorities.</p><button type="button" class="primary-btn" data-go-view="goals">Review goals</button></div>';
+  populateCheckinGoals();
+  const checkinDetails=checkin?String(checkin.note||'').match(/Energy ([1-5])\/5 \| Focus time available: ([^|]+) \| Attention: ([^|]+)/):null;$('#dailyCheckinStatus').textContent=checkin?'Latest check-in recorded at '+new Date(checkin.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'. You can submit another check-in to update it.'+(checkinDetails?' Energy '+checkinDetails[1]+'/5 · Focus time '+checkinDetails[2].trim()+' · Attention: '+checkinDetails[3].trim():''):'No check-in recorded today.';
+  const sources=[];
+  sources.push('<div class="evidence-item"><i class="bullet"></i><span>Calendar</span><b>Not connected</b></div>');
+  sources.push('<div class="evidence-item"><i class="bullet"></i><span>Confirmed email context</span><b>'+(!appUser||!remoteConnected?'Not signed in':!emailScoreSignalsAvailable?'Unavailable':confirmed+' goal-linked')+'</b></div>');
+  if(emailScoreSignalsAvailable&&emailScoreSignalsSyncedAt)sources.push('<div class="evidence-item"><i class="bullet"></i><span>Email context last checked</span><b>'+escapeHTML(new Date(emailScoreSignalsSyncedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}))+'</b></div>');
+  sources.push('<div class="evidence-item"><i class="bullet"></i><span>Pandora project source</span><b>'+(appUser&&remoteConnected?(sourceSnapshot.projects&&sourceSnapshot.projects.available?'Permission-limited':'Unavailable'):'Not signed in')+'</b></div>');
+  if(appUser&&remoteConnected&&sourceSnapshot.syncedAt)sources.push('<div class="evidence-item"><i class="bullet"></i><span>Project source last checked</span><b>'+escapeHTML(new Date(sourceSnapshot.syncedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}))+'</b></div>');
+  sources.push('<div class="evidence-item"><i class="bullet"></i><span>Activity source</span><b>User-logged</b></div>');
+  $('#dailyEvidenceNotes').innerHTML=sources.join('');
+}
+function renderWeeklyReview(){
+  const metrics=$('#weeklyMetrics');if(!metrics)return;
+  const since=Date.now()-7*86400000;
+  const events=(state.events||[]).filter(e=>Number.isFinite(Date.parse(e.at||''))&&Date.parse(e.at||'')>=since);
+  const progress=events.filter(e=>eventTypeKey(e)==='progress').length;
+  const blockers=events.filter(e=>eventTypeKey(e)==='blocker').length;
+  const checkins=events.filter(e=>eventTypeKey(e)==='checkin').length;
+  const minutes=events.reduce((sum,e)=>sum+(Number(e.minutes)>0?Number(e.minutes):0),0);
+  const stats=[{n:events.length,label:'Logged entries'},{n:progress,label:'Progress notes'},{n:blockers,label:'Blockers recorded'},{n:minutes,label:'Minutes explicitly logged'}];
+  metrics.innerHTML=stats.map(s=>'<div class="weekly-metric"><strong>'+s.n+'</strong><span>'+escapeHTML(s.label)+'</span></div>').join('');
+  const activityByGoal=new Map();
+  events.forEach(e=>{if(!e.goalId)return;const item=activityByGoal.get(e.goalId)||{count:0,progress:0,blockers:0,minutes:0};item.count++;if(eventTypeKey(e)==='progress')item.progress++;if(eventTypeKey(e)==='blocker')item.blockers++;item.minutes+=Number(e.minutes)>0?Number(e.minutes):0;activityByGoal.set(e.goalId,item);});
+  const touched=[...activityByGoal.entries()].map(([id,v])=>({goal:getGoal(id),...v})).filter(v=>v.goal).sort((a,b)=>b.count-a.count);
+  const highlights=[];
+  if(touched.length){const t=touched[0];highlights.push('<div class="weekly-review-item"><div><strong>Most recorded activity</strong><p>'+escapeHTML(t.goal.name)+' · '+t.count+' related entries, including '+t.progress+' progress note'+(t.progress===1?'':'s')+'.</p></div><b>'+t.count+'</b></div>');}
+  else highlights.push('<div class="weekly-review-item"><div><strong>No goal-linked activity found</strong><p>This only means no related activity was recorded in Compass during this period.</p></div></div>');
+  highlights.push('<div class="weekly-review-item"><div><strong>Blockers</strong><p>'+(blockers?'Recorded '+blockers+' blocker entr'+(blockers===1?'y':'ies')+'. Review whether each needs a next step.':'No blockers were logged. That is not proof there were none.')+'</p></div><b>'+blockers+'</b></div>');
+  highlights.push('<div class="weekly-review-item"><div><strong>Check-ins</strong><p>'+(checkins?checkins+' self-reported check-in'+(checkins===1?'':'s')+' recorded.':'No daily check-in was recorded in the last seven days.')+'</p></div><b>'+checkins+'</b></div>');
+  const noProgress=state.goals.filter(g=>g.status==='active'&&!events.some(e=>e.goalId===g.id&&eventTypeKey(e)==='progress')).sort((a,b)=>scoreForHorizon(b,'week')-scoreForHorizon(a,'week')).slice(0,3);
+  if(noProgress.length)highlights.push('<div class="weekly-review-item"><div><strong>Goals without a logged progress note</strong><p>'+noProgress.map(g=>escapeHTML(g.name)).join(', ')+'. Consider whether they need attention or simply an update.</p></div></div>');
+  const next=state.goals.filter(g=>g.status==='active').map(g=>({...g,score:scoreForHorizon(g,'week')})).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name))[0];
+  if(next)highlights.push('<div class="weekly-review-item"><div><strong>Candidate for next week</strong><p>'+escapeHTML(next.name)+': '+escapeHTML(next.nextAction)+'. Based on current goal inputs, not a guarantee or an automatic commitment.</p></div><b>'+scoreForHorizon(next,'week')+'</b></div>');
+  $('#weeklyHighlights').innerHTML=highlights.join('');
+  $('#weeklyActivity').innerHTML=events.length?events.slice().sort((a,b)=>Date.parse(b.at||'')-Date.parse(a.at||'')).slice(0,6).map(e=>{const g=getGoal(e.goalId);return '<div class="weekly-review-item"><div><strong>'+escapeHTML(g?g.name:e.goalId?'Removed goal':'General')+' · '+escapeHTML(e.type)+'</strong><p>'+escapeHTML(displayEventNote(e.note))+'</p></div><b>'+escapeHTML(new Date(e.at).toLocaleDateString([], {month:'short',day:'numeric'}))+'</b></div>';}).join(''):'<div class="empty-state">No entries in the last seven days. You can add an update on the Activity page or start with today’s check-in.</div>';
+}
+async function recordDailyEvent(goalId,type,note,minutes){
+  if(appUser&&remoteConnected){
+    const data=await apiRequest('/api/compass',{action:'log_activity',goalId:goalId,eventType:type,note:note,minutes:minutes||null});
+    if(!data.event)throw new Error('The activity service returned no saved record.');
+    state.events.unshift(activityFromRow(data.event));state.events=state.events.slice(0,100);renderAll();return true;
+  }
+  addEvent(goalId,type,note,minutes);renderAll();return false;
+}
+function renderActivity(){const goalSel=$('#activityGoal');const val=goalSel.value;goalSel.innerHTML=state.goals.map(g=>'<option value="'+escapeHTML(g.id)+'">'+escapeHTML(g.name)+'</option>').join('');if(getGoal(val))goalSel.value=val;const events=state.events;$('#activityList').innerHTML=events.length?events.map(e=>{const g=getGoal(e.goalId);return '<div class="activity-item"><div class="activity-time">'+escapeHTML(new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric'}).format(new Date(e.at)))+'<br>'+escapeHTML(new Date(e.at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}))+'</div><div><strong>'+escapeHTML(g?g.name:'Removed goal')+' · '+escapeHTML(e.type)+(e.minutes?' · '+e.minutes+' min':'')+'</strong><p>'+escapeHTML(displayEventNote(e.note))+'</p></div><span class="activity-kind">USER LOGGED</span></div>';}).join(''):'<div class="empty-state">Nothing logged yet.<br>Add an activity event to give the compass more context.</div>';}
 function resetAll(){if(appUser){alert('Demo reset is disabled while your account is connected. Edit or delete your saved goals instead.');return;}if(!confirm('Reset all local Goal Compass data to the illustrative starting goals? This clears the activity log and manual override.'))return;state=defaultState();save();closeEditor();renderAll();setView('compass');}
-function renderAll(){document.documentElement.dataset.theme=state.theme==='light'?'light':'dark';$$('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===state.mode)));$('#resetDemo').disabled=!!appUser;$('#resetDemo').title=appUser?'Demo reset is disabled for account data':'Reset illustrative local demo data';renderCompass();renderGoals();renderActivity();}
+function renderAll(){document.documentElement.dataset.theme=state.theme==='light'?'light':'dark';$('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===state.mode)));$('#resetDemo').disabled=!!appUser;$('#resetDemo').title=appUser?'Demo reset is disabled for account data':'Reset illustrative local demo data';renderCompass();renderGoals();renderActivity();renderToday();renderWeeklyReview();}
 
 async function loadEmailScoreSignals(){
-  if(!appUser||!remoteConnected){emailScoreSignals=[];return;}
-  try{const data=await apiRequest('/api/email?action=score-context');emailScoreSignals=Array.isArray(data.signals)?data.signals:[];}
-  catch(e){emailScoreSignals=[];}
+  if(!appUser||!remoteConnected){emailScoreSignals=[];emailScoreSignalsAvailable=false;emailScoreSignalsSyncedAt=null;return;}
+  try{const data=await apiRequest('/api/email?action=score-context');emailScoreSignals=Array.isArray(data.signals)?data.signals:[];emailScoreSignalsAvailable=true;emailScoreSignalsSyncedAt=data.syncedAt||new Date().toISOString();}
+  catch(e){emailScoreSignals=[];emailScoreSignalsAvailable=false;emailScoreSignalsSyncedAt=null;}
 }
 async function loadEmailWorkspace(){
   if(!appUser||!remoteConnected){emailWorkspace={providers:{},connections:[],signals:[]};renderConnections();return;}
@@ -306,6 +411,52 @@ function renderConnections(){
     return '<article class="email-signal"><div><h3>'+escapeHTML(s.subject||'(No subject)')+'</h3><div class="email-signal-meta">'+escapeHTML(label)+' · Confidence '+confidence+'/5 · '+escapeHTML(stateLabel)+'</div><p>'+escapeHTML(s.evidence_reason||'No explanation available.')+'</p><div class="email-signal-meta">'+escapeHTML(s.sender_name||'Unknown sender')+(s.sender_email?' · '+escapeHTML(s.sender_email):'')+' · '+escapeHTML(when)+(account?' · '+escapeHTML(account.account_email):'')+'</div>'+(s.due_at?'<p>Possible due date: '+escapeHTML(new Date(s.due_at).toLocaleDateString())+'</p>':'')+openLink+goalPicker+'</div><div class="email-signal-actions">'+actions+'</div></article>';
   }).join(''):'<div class="empty-state">No email signals yet. Connect a mailbox and choose Sync now. Only recent inbox messages are checked.</div>';
 }
+function openPasswordRecoveryRequest(message){
+  $('#authModal').hidden=false;$('#authTitle').textContent='Recover your account';
+  $('#authTabs').hidden=true;$('#authForm').hidden=true;$('#forgotPassword').hidden=true;
+  $('#recoveryUpdatePanel').hidden=true;$('#recoveryRequestPanel').hidden=false;$('#authCancel').hidden=true;
+  $('#recoveryEmail').value=$('#authEmail').value||'';$('#authMessage').textContent=message||'Enter your sign-in email to request a password reset.';
+}
+function openPasswordRecoveryUpdate(token){
+  recoveryAccessToken=token;$('#authModal').hidden=false;$('#authTitle').textContent='Choose a new password';
+  $('#authTabs').hidden=true;$('#authForm').hidden=true;$('#forgotPassword').hidden=true;
+  $('#recoveryRequestPanel').hidden=true;$('#recoveryUpdatePanel').hidden=false;$('#authCancel').hidden=true;
+  $('#authMessage').textContent='Reset link detected. Set a new password to restore access.';
+}
+function consumePasswordRecoveryReturn(){
+  const url=new URL(window.location.href),params=new URLSearchParams(url.hash.slice(1));
+  const type=params.get('type')||'',hasRecovery=url.searchParams.get('recovery')==='1'||type==='recovery'||params.has('error_code');
+  if(!hasRecovery)return;
+  const token=params.get('access_token')||'';
+  if(url.hash)window.history.replaceState({},'',url.pathname+(url.search||''));
+  if(type==='recovery'&&token.length>=20&&token.length<=4096)openPasswordRecoveryUpdate(token);
+  else openPasswordRecoveryRequest('That reset link is missing or expired. Request a fresh password-reset email.');
+}
+async function exportPersonalData(){
+  const button=$('#exportDataButton'),status=$('#exportDataStatus');if(button){button.disabled=true;button.textContent='Preparing export…';}
+  try{
+    let payload;
+    if(appUser&&remoteConnected){
+      payload=await apiRequest('/api/export');
+      payload.exportScope='Signed-in Compass records plus the bounded Pandora source snapshot currently visible to this account.';
+      payload.visiblePandoraContextSnapshot=sourceSnapshot;
+    }else{
+      payload={
+        schemaVersion:1,exportedAt:new Date().toISOString(),exportScope:'browser-local demo only',
+        account:null,
+        compass:{goals:state.goals,activity:state.events.map(e=>({...e,note:displayEventNote(e.note)})),preferences:{currentFocusGoalId:state.currentFocus,planningHorizon:state.mode,manualPriority:state.override,theme:state.theme}},
+        visiblePandoraContextSnapshot:null,email:{connections:[],signals:[]},
+        privacyNote:'This local-demo export contains only browser-local data and excludes provider credentials.'
+      };
+    }
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+    const objectUrl=window.URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=objectUrl;link.download='goal-compass-export-'+localDateKey()+'.json';link.style.display='none';document.body.appendChild(link);link.click();link.remove();
+    window.setTimeout(()=>window.URL.revokeObjectURL(objectUrl),1000);
+    if(status)status.textContent='Export prepared. Signed-in exports include paginated Compass records and email metadata; provider credentials are excluded.';
+  }catch(err){if(status)status.textContent='Export was not completed: '+err.message;}
+  finally{if(button){button.disabled=false;button.textContent='Export my data as JSON';}}
+}
 function consumeEmailOAuthReturn(){
   const url=new URL(window.location.href);const result=url.searchParams.get('emailConnection');if(!result)return;
   const reason=url.searchParams.get('reason')||'';url.searchParams.delete('emailConnection');url.searchParams.delete('reason');window.history.replaceState({},'',url.pathname+(url.search?url.search:'')+url.hash);
@@ -315,6 +466,41 @@ function consumeEmailOAuthReturn(){
   setView('connections');
 }
 
+$('#dailyPlan').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-daily-action]');if(!b)return;const id=b.dataset.goalId,g=getGoal(id);if(!g||g.status!=='active')return;
+  const action=b.dataset.dailyAction;b.disabled=true;
+  try{
+    if(action==='later'){
+      const marker='[compass-not-now:'+localDateKey()+':'+id+']';
+      await recordDailyEvent(id,'Decision',marker+' Deferred from today’s plan until tomorrow.',null);
+      $('#dailyToast').textContent=g.name+' was removed from today’s suggestions. You can still find it under Goals.';
+    }else if(action==='focus'||action==='start'){
+      state.currentFocus=id;state.override={id:id,date:localDateKey()};save();
+      const settingsSaved=await persistSettings();
+      if(action==='start')await recordDailyEvent(id,'Action started','Started next action: '+g.nextAction,null);
+      else await recordDailyEvent(id,'Priority override','User chose '+g.name+' as today’s priority from the daily plan.',null);
+      renderAll();
+      const actionMessage=action==='start'?'Started and logged: '+g.nextAction:g.name+' is now your chosen priority for today.';
+      $('#dailyToast').textContent=settingsSaved?actionMessage:actionMessage+' The action was logged, but the priority preference did not sync; check the account connection.';
+    }
+  }catch(err){$('#dailyToast').textContent='The action could not be fully saved: '+err.message;renderToday();}
+});
+$('#dailyCheckinForm').addEventListener('submit',async e=>{
+  e.preventDefault();const button=$('#saveDailyCheckin');button.disabled=true;button.textContent='Saving…';
+  const energy=$('#checkinEnergy').value,capacity=$('#checkinCapacity').value,goalId=$('#checkinGoal').value||null;
+  const focus=$('#checkinFocus').value.trim().slice(0,100),win=$('#checkinWin').value.trim().slice(0,100),blocker=$('#checkinBlocker').value.trim().slice(0,100);
+  const note='[daily-check-in:'+localDateKey()+'] Energy '+energy+'/5 | Focus time available: '+capacity+' | Attention: '+(focus||'Not specified')+' | Win: '+(win||'Not specified')+' | Blocker: '+(blocker||'Not specified');
+  try{
+    const synced=await recordDailyEvent(goalId,'Check-in',note,null);
+    let blockerSaved=true;
+    if(blocker){try{await recordDailyEvent(goalId,'Blocker','Blocker reported in daily check-in: '+blocker,null);}catch(blockerError){blockerSaved=false;}}
+    $('#dailyCheckinForm').reset();$('#checkinEnergy').value=energy;$('#checkinCapacity').value=capacity;populateCheckinGoals();
+    $('#dailyCheckinStatus').textContent='Check-in recorded '+(synced?'to your signed-in account':'in this browser only')+'. The entries reflect what you reported.'+(blocker&&!blockerSaved?' The check-in was saved, but its separate blocker entry did not sync.':'');
+    $('#dailyToast').textContent=blocker?(blockerSaved?'Check-in recorded. The blocker is also logged for review.':'Check-in recorded; the blocker needs a separate retry.'):'Check-in recorded.';
+    renderAll();
+  }catch(err){$('#dailyCheckinStatus').textContent='Could not confirm that the check-in was saved: '+err.message;$('#dailyToast').textContent='Check-in save needs attention. Review the account connection before retrying.';}
+  finally{button.disabled=false;button.textContent='Save today’s check-in';}
+});
 $('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));$$('[data-go-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.goView)));$$('[data-goal]',$('#dial')).forEach(b=>b.addEventListener('click',()=>{const g=getGoal(b.dataset.goal);if(g){state.currentFocus=g.id;save();renderCompass();}}));$$('[data-mode]').forEach(b=>b.addEventListener('click',()=>updateMode(b.dataset.mode)));$('#currentFocus').addEventListener('change',e=>{if(getGoal(e.target.value)){state.currentFocus=e.target.value;save();renderCompass();persistSettings();}});$('#themeToggle').addEventListener('click',()=>{state.theme=state.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=state.theme;save();persistSettings();});$('#startAction').addEventListener('click',()=>{const g=recommended();if(!g)return;state.actionStarted={goalId:g.id,at:new Date().toISOString(),action:g.nextAction};addEvent(g.id,'Action started',g.nextAction,'');$('#compassToast').textContent='Action started and logged locally. Open Activity to see the event.';save();renderCompass();});$('#setOverride').addEventListener('click',()=>{const g=recommended();if(!g)return;const chosen=getGoal(state.currentFocus)||g;state.override={id:chosen.id,date:localDateKey()};addEvent(chosen.id,'Priority override','User explicitly set '+chosen.name+' as today’s priority.','');$('#compassToast').textContent=chosen.name+' is now the manual priority for today.';save();renderCompass();persistSettings();});$('#resetDemo').addEventListener('click',resetAll);$('#closeEditor').addEventListener('click',closeEditor);$('#cancelEditor').addEventListener('click',closeEditor);['importance','urgency','impact','momentum','confidence','progress'].forEach(k=>$('#edit'+k[0].toUpperCase()+k.slice(1)).addEventListener('input',updateRangeLabels));$('#goalForm').addEventListener('submit',async e=>{
   e.preventDefault();const id=$('#editGoalId').value;let g=getGoal(id);const isNew=!g;const previous=g?{...g,linkedProjectIds:[...(g.linkedProjectIds||[])]}:null;const name=normalizeName($('#editName').value);
   if(!name){$('#editName').focus();return;}const dir=Number($('#editDirection').value);
@@ -339,7 +525,10 @@ load();renderAll();
 
 function chooseAuthMode(mode){
   const m=mode==='signup'?'signup':'signin';
-  $$('[data-auth-mode]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.authMode===m)));
+  $('#authTitle').textContent='Connect your compass.';
+  $('#authTabs').hidden=false;$('#authForm').hidden=false;$('#recoveryRequestPanel').hidden=true;$('#recoveryUpdatePanel').hidden=true;$('#authCancel').hidden=false;
+  $('#forgotPassword').hidden=m==='signup';
+  $('[data-auth-mode]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.authMode===m)));
   $('#authSubmit').textContent=m==='signup'?'Create account':'Sign in securely';
   $('#authPassword').autocomplete=m==='signup'?'new-password':'current-password';
   $('#authMessage').textContent=m==='signup'?'Use an email address you can confirm. Supabase may require email verification before the first sign-in.':'Sign in to load private goals and live Pandora source signals.';
@@ -351,10 +540,38 @@ async function signOutAccount(){
   renderAll();renderConnections();setView('compass');setConnectionLabel('Local demo · not synced',false);
 }
 $('#accountButton').addEventListener('click',()=>{if(appUser){signOutAccount();return;}$('#authModal').hidden=false;chooseAuthMode('signin');$('#authEmail').focus();});
-$('#authCancel').addEventListener('click',()=>{$('#authModal').hidden=true;});
-$('#authClose').addEventListener('click',()=>{$('#authModal').hidden=true;});
+$('#authCancel').addEventListener('click',()=>{$('#authModal').hidden=true;recoveryAccessToken=null;});
+$('#forgotPassword').addEventListener('click',()=>openPasswordRecoveryRequest());
+$('#recoveryBackRequest').addEventListener('click',()=>chooseAuthMode('signin'));
+$('#recoveryRequestForm').addEventListener('submit',async e=>{
+  e.preventDefault();const button=$('#recoveryRequestSubmit');button.disabled=true;button.textContent='Requesting…';
+  try{
+    const response=await fetch('/api/auth',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'password-recovery',email:$('#recoveryEmail').value.trim()})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'Password recovery is temporarily unavailable.');
+    $('#authMessage').textContent=data.message||'If an account exists for that address, a password-reset email will be sent.';
+  }catch(err){$('#authMessage').textContent=err.message||'Password recovery is temporarily unavailable.';}
+  finally{button.disabled=false;button.textContent='Send reset email';}
+});
+$('#recoveryUpdateForm').addEventListener('submit',async e=>{
+  e.preventDefault();const password=$('#recoveryNewPassword').value,confirm=$('#recoveryConfirmPassword').value,button=$('#recoveryUpdateSubmit');
+  if(password!==confirm){$('#authMessage').textContent='The two passwords do not match.';$('#recoveryConfirmPassword').focus();return;}
+  if(!recoveryAccessToken){$('#authMessage').textContent='This reset link is unavailable. Request a new password-reset email.';return;}
+  button.disabled=true;button.textContent='Updating…';
+  try{
+    const response=await fetch('/api/auth',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'set-recovered-password',recoveryAccessToken,newPassword:password})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'The password could not be updated.');
+    recoveryAccessToken=null;$('#recoveryNewPassword').value='';$('#recoveryConfirmPassword').value='';
+    const url=new URL(window.location.href);url.searchParams.delete('recovery');window.history.replaceState({},'',url.pathname+(url.search||''));
+    chooseAuthMode('signin');$('#authMessage').textContent='Password updated. Sign in with your new password.';
+  }catch(err){$('#authMessage').textContent=err.message||'The password could not be updated.';}
+  finally{button.disabled=false;button.textContent='Update password';}
+});
+$('#exportDataButton').addEventListener('click',exportPersonalData);
+$('#authClose').addEventListener('click',()=>{$('#authModal').hidden=true;recoveryAccessToken=null;});
 $$('[data-auth-mode]').forEach(b=>b.addEventListener('click',()=>chooseAuthMode(b.dataset.authMode)));
-$('#authModal').addEventListener('click',e=>{if(e.target===$('#authModal'))$('#authModal').hidden=true;});
+$('#authModal').addEventListener('click',e=>{if(e.target===$('#authModal')){$('#authModal').hidden=true;recoveryAccessToken=null;}});
 $('#newGoal').addEventListener('click',openNewGoal);
 $('#emailAccountGrid').addEventListener('click',async e=>{
   const connect=e.target.closest('[data-email-connect]'),sync=e.target.closest('[data-email-sync]'),disconnect=e.target.closest('[data-email-disconnect]');
@@ -398,6 +615,7 @@ $('#authForm').addEventListener('submit',async e=>{
 });
 
 async function startCompass(){
+  consumePasswordRecoveryReturn();
   consumeEmailOAuthReturn();
   await bootstrapSession();
   if($('#page-connections').classList.contains('active')&&appUser&&remoteConnected)await loadEmailWorkspace();

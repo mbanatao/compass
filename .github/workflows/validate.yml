@@ -1,8 +1,9 @@
 name: Goal Compass validation
 
 on:
+  workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, production-readiness-foundation]
   pull_request:
 
 permissions:
@@ -18,3 +19,5 @@ jobs:
           node-version: 22
       - name: Parse browser and server JavaScript
         run: node scripts/check.mjs
+      - name: Test server-side security contracts
+        run: node --test tests/*.test.cjs
