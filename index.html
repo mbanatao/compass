@@ -52,9 +52,12 @@ html[data-theme="light"]{color-scheme:light;--bg:#f1efe8;--surface:#faf9f5;--sur
 <section class="auth-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
 <div class="eyebrow">Private data connection</div><h2 id="authTitle">Connect your compass.</h2>
 <p>Sign in to sync your goals across devices and read Pandora project signals permitted by your account. Browser-local demo data is not merged automatically.</p>
-<div class="auth-tabs" role="tablist" aria-label="Account mode"><button type="button" data-auth-mode="signin" aria-selected="true">Sign in</button><button type="button" data-auth-mode="signup" aria-selected="false">Create account</button></div>
+<div class="auth-tabs" id="authTabs" role="tablist" aria-label="Account mode"><button type="button" data-auth-mode="signin" aria-selected="true">Sign in</button><button type="button" data-auth-mode="signup" aria-selected="false">Create account</button></div>
 <form id="authForm"><div class="field"><label for="authEmail">Email address</label><input id="authEmail" name="email" type="email" autocomplete="email" maxlength="254" required></div><div class="field"><label for="authPassword">Password</label><input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="256" required></div><div class="auth-actions"><button type="submit" class="primary-btn full" id="authSubmit">Sign in securely</button></div></form>
-<p class="auth-message" id="authMessage" role="status" aria-live="polite"></p><div class="auth-actionbar"><button type="button" class="text-link" id="authCancel">Continue with local demo</button><button type="button" class="text-link" id="authClose">Close</button></div>
+<button type="button" class="text-link" id="forgotPassword">Forgot password?</button>
+<div class="recovery-panel" id="recoveryRequestPanel" hidden><p>Enter your sign-in email. For privacy, the response is the same whether or not an account exists for that address.</p><form id="recoveryRequestForm"><div class="field"><label for="recoveryEmail">Email address</label><input id="recoveryEmail" type="email" autocomplete="email" maxlength="254" required></div><button type="submit" class="primary-btn full" id="recoveryRequestSubmit">Send reset email</button><button type="button" class="text-link" id="recoveryBackRequest">Back to sign in</button></form></div>
+<div class="recovery-panel" id="recoveryUpdatePanel" hidden><p>Choose a new password for your Compass account. Reset links expire and can only be used with the account that requested them.</p><form id="recoveryUpdateForm"><div class="field"><label for="recoveryNewPassword">New password</label><input id="recoveryNewPassword" type="password" autocomplete="new-password" minlength="8" maxlength="256" required></div><div class="field"><label for="recoveryConfirmPassword">Confirm new password</label><input id="recoveryConfirmPassword" type="password" autocomplete="new-password" minlength="8" maxlength="256" required></div><button type="submit" class="primary-btn full" id="recoveryUpdateSubmit">Update password</button></form></div>
+<p class="auth-message" id="authMessage" role="status" aria-live="polite"></p><div class="auth-actionbar" id="authActionbar"><button type="button" class="text-link" id="authCancel">Continue with local demo</button><button type="button" class="text-link" id="authClose">Close</button></div>
 <p class="auth-note">Sessions use secure, HttpOnly cookies. Supabase keys remain on the server. Your goals are private to your account by row-level security.</p>
 </section></div>
 <div class="shell">
@@ -95,7 +98,7 @@ html[data-theme="light"]{color-scheme:light;--bg:#f1efe8;--surface:#faf9f5;--sur
 <div class="weekly-review-grid"><section class="compact-panel"><div class="eyebrow">Attention and follow-through</div><h2 style="margin-top:5px">What the record shows</h2><div id="weeklyHighlights" class="evidence-list"></div></section><section class="compact-panel"><div class="eyebrow">Last seven days</div><h2 style="margin-top:5px">Recent activity</h2><div id="weeklyActivity" style="margin-top:9px"></div></section></div>
 <div class="notice" style="margin-top:16px">This review measures recorded events and time entries only. It does not infer how productive, healthy, or successful you were. Use it to correct the record and choose what should change next week.</div>
 </section>
-<section class="page" id="page-method"><div class="page-head"><div><div class="eyebrow">Transparent by design</div><h1>A compass with reasons.</h1><p class="head-copy">The priority engine is deterministic and inspectable. AI can explain results later, but it should not invent the scoring truth.</p></div></div><div class="method-grid"><div class="method-card"><div class="eyebrow">01 / Score</div><h3>Weighted, deterministic priority</h3><div class="formula" id="formulaText">Importance × weight<br>Urgency × weight<br>Impact × weight<br>Momentum × weight<br>Evidence confidence × weight</div><p>Each input is scored from 1 to 5. Each planning horizon changes the weights; scores are normalized to 100. Paused and completed goals are excluded from the recommendation.</p></div><div class="method-card"><div class="eyebrow">02 / Recommend</div><h3>Choose the highest eligible goal</h3><p>The engine sorts eligible goals by score. A user-created “today priority” override wins until the end of the local day, and the interface labels it as a manual decision.</p><ul><li>Show the score and input breakdown.</li><li>Explain deadline or blocker signals.</li><li>Keep user overrides distinguishable from calculated recommendations.</li></ul></div><div class="method-card"><div class="eyebrow">03 / Learn</div><h3>Keep evidence quality intact</h3><p>Activity is a raw event log. A repeated observation should only become a durable lesson after validation. Email-derived signals use transparent heuristics, save minimal metadata rather than full message bodies, and require your review.</p><div class="notice">Future integrations can read project/task/calendar sources and a bounded, provenance-aware Memory context. Missing or stale inputs should reduce confidence instead of being silently guessed.</div></div><div class="method-card"><div class="eyebrow">04 / Current limits</div><h3>What this version does not claim</h3><ul><li>It does not know your actual work unless you log it.</li><li>It does not read phone orientation sensors.</li><li>Only signed-in sessions sync private goals and activity to Supabase; local demo data remains browser-local.</li><li>Email reading requires a configured provider app and separate consent for each mailbox. Pandora Memory, calendar, finance, and phone sensors remain separate integrations.</li></ul><p>The visual bearing compares the goal direction you selected with the direction recommended by the scoring engine. It is not GPS, a physical compass, or a measurement of your behavior.</p></div></div></section>
+<section class="page" id="page-method"><div class="page-head"><div><div class="eyebrow">Transparent by design</div><h1>A compass with reasons.</h1><p class="head-copy">The priority engine is deterministic and inspectable. AI can explain results later, but it should not invent the scoring truth.</p></div></div><div class="method-grid"><div class="method-card"><div class="eyebrow">01 / Score</div><h3>Weighted, deterministic priority</h3><div class="formula" id="formulaText">Importance × weight<br>Urgency × weight<br>Impact × weight<br>Momentum × weight<br>Evidence confidence × weight</div><p>Each input is scored from 1 to 5. Each planning horizon changes the weights; scores are normalized to 100. Paused and completed goals are excluded from the recommendation.</p></div><div class="method-card"><div class="eyebrow">02 / Recommend</div><h3>Choose the highest eligible goal</h3><p>The engine sorts eligible goals by score. A user-created “today priority” override wins until the end of the local day, and the interface labels it as a manual decision.</p><ul><li>Show the score and input breakdown.</li><li>Explain deadline or blocker signals.</li><li>Keep user overrides distinguishable from calculated recommendations.</li></ul></div><div class="method-card"><div class="eyebrow">03 / Learn</div><h3>Keep evidence quality intact</h3><p>Activity is a raw event log. A repeated observation should only become a durable lesson after validation. Email-derived signals use transparent heuristics, save minimal metadata rather than full message bodies, and require your review.</p><div class="notice">Future integrations can read project/task/calendar sources and a bounded, provenance-aware Memory context. Missing or stale inputs should reduce confidence instead of being silently guessed.</div></div><div class="method-card"><div class="eyebrow">04 / Current limits</div><h3>What this version does not claim</h3><ul><li>It does not know your actual work unless you log it.</li><li>It does not read phone orientation sensors.</li><li>Only signed-in sessions sync private goals and activity to Supabase; local demo data remains browser-local.</li><li>Email reading requires a configured provider app and separate consent for each mailbox. Pandora Memory, calendar, finance, and phone sensors remain separate integrations.</li></ul><p>The visual bearing compares the goal direction you selected with the direction recommended by the scoring engine. It is not GPS, a physical compass, or a measurement of your behavior.</p></div></div><div class="compact-panel privacy-tools" style="margin-top:14px"><div class="eyebrow">Your data / export</div><h2 style="margin-top:5px">Keep a copy of your Compass data.</h2><p class="muted-copy">Download goals, activity history, preferences, linked project context visible to this account, and email signal metadata. Provider refresh tokens and server secrets are never included. Local demo exports contain only browser-local demo data.</p><button type="button" class="secondary-btn" id="exportDataButton">Export my data as JSON</button><p class="daily-checkin-status" id="exportDataStatus" role="status" aria-live="polite">Export runs in this browser when you request it.</p></div></section>
 
 <section class="page" id="page-connections" data-page="connections">
   <div class="page-head"><div><div class="eyebrow">External accounts / read only</div><h1>Connect your context.</h1><p class="head-copy">Authorize the mailboxes you want Compass to read. Each account is verified against the address you select. Compass reads recent inbox metadata and short previews to suggest possible replies, deadlines, and follow-ups; it never sends email.</p></div></div>
@@ -116,7 +119,7 @@ const defaultGoals=[
 {id:'finance',name:'FINANCE',direction:180,description:'Keep cash flow, obligations, and business economics visible.',nextAction:'Review the highest-value open financial loop.',importance:4,urgency:4,impact:4,momentum:3,confidence:3,progress:42,status:'active',deadline:''},
 {id:'people',name:'PEOPLE',direction:270,description:'Maintain the relationships and trust that matter over the long term.',nextAction:'Reach out to one important person.',importance:3,urgency:2,impact:4,momentum:3,confidence:4,progress:70,status:'active',deadline:''}
 ];
-const defaultState=()=>({goals:defaultGoals.map(g=>({...g})),events:[],currentFocus:'finance',mode:'today',override:null,theme:'dark',actionStarted:null});let state=defaultState();let editingId=null;let appUser=null;let remoteConnected=false;let sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};let emailWorkspace={providers:{},connections:[],signals:[]};let emailWorkspaceLoading=false;let emailScoreSignals=[];let emailScoreSignalsAvailable=false;let emailScoreSignalsSyncedAt=null;const requestedEmailAccounts=[{email:'joven_ong@hotmail.com',provider:'microsoft'},{email:'joven.ong23@gmail.com',provider:'google'},{email:'jovenongz@gmail.com',provider:'google'},{email:'unclejose0@gmail.com',provider:'google'},{email:'markjohnsonbanatao888@gmail.com',provider:'google'}];
+const defaultState=()=>({goals:defaultGoals.map(g=>({...g})),events:[],currentFocus:'finance',mode:'today',override:null,theme:'dark',actionStarted:null});let state=defaultState();let editingId=null;let appUser=null;let recoveryAccessToken=null;let remoteConnected=false;let sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};let emailWorkspace={providers:{},connections:[],signals:[]};let emailWorkspaceLoading=false;let emailScoreSignals=[];let emailScoreSignalsAvailable=false;let emailScoreSignalsSyncedAt=null;const requestedEmailAccounts=[{email:'joven_ong@hotmail.com',provider:'microsoft'},{email:'joven.ong23@gmail.com',provider:'google'},{email:'jovenongz@gmail.com',provider:'google'},{email:'unclejose0@gmail.com',provider:'google'},{email:'markjohnsonbanatao888@gmail.com',provider:'google'}];
 function load(){try{const raw=localStorage.getItem(STORE);if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.goals)&&parsed.goals.length){state={...defaultState(),...parsed,goals:parsed.goals};}}}catch(e){console.warn('Goal Compass local data could not be loaded.',e)}if(!state.goals.some(g=>g.id===state.currentFocus))state.currentFocus=state.goals[0]?.id||'build';}
 function save(){
   // Keep browser demo state separate from authenticated Supabase state; never overwrite a local demo with private-account data.
@@ -408,6 +411,52 @@ function renderConnections(){
     return '<article class="email-signal"><div><h3>'+escapeHTML(s.subject||'(No subject)')+'</h3><div class="email-signal-meta">'+escapeHTML(label)+' · Confidence '+confidence+'/5 · '+escapeHTML(stateLabel)+'</div><p>'+escapeHTML(s.evidence_reason||'No explanation available.')+'</p><div class="email-signal-meta">'+escapeHTML(s.sender_name||'Unknown sender')+(s.sender_email?' · '+escapeHTML(s.sender_email):'')+' · '+escapeHTML(when)+(account?' · '+escapeHTML(account.account_email):'')+'</div>'+(s.due_at?'<p>Possible due date: '+escapeHTML(new Date(s.due_at).toLocaleDateString())+'</p>':'')+openLink+goalPicker+'</div><div class="email-signal-actions">'+actions+'</div></article>';
   }).join(''):'<div class="empty-state">No email signals yet. Connect a mailbox and choose Sync now. Only recent inbox messages are checked.</div>';
 }
+function openPasswordRecoveryRequest(message){
+  $('#authModal').hidden=false;$('#authTitle').textContent='Recover your account';
+  $('#authTabs').hidden=true;$('#authForm').hidden=true;$('#forgotPassword').hidden=true;
+  $('#recoveryUpdatePanel').hidden=true;$('#recoveryRequestPanel').hidden=false;$('#authCancel').hidden=true;
+  $('#recoveryEmail').value=$('#authEmail').value||'';$('#authMessage').textContent=message||'Enter your sign-in email to request a password reset.';
+}
+function openPasswordRecoveryUpdate(token){
+  recoveryAccessToken=token;$('#authModal').hidden=false;$('#authTitle').textContent='Choose a new password';
+  $('#authTabs').hidden=true;$('#authForm').hidden=true;$('#forgotPassword').hidden=true;
+  $('#recoveryRequestPanel').hidden=true;$('#recoveryUpdatePanel').hidden=false;$('#authCancel').hidden=true;
+  $('#authMessage').textContent='Reset link detected. Set a new password to restore access.';
+}
+function consumePasswordRecoveryReturn(){
+  const url=new URL(window.location.href),params=new URLSearchParams(url.hash.slice(1));
+  const type=params.get('type')||'',hasRecovery=url.searchParams.get('recovery')==='1'||type==='recovery'||params.has('error_code');
+  if(!hasRecovery)return;
+  const token=params.get('access_token')||'';
+  if(url.hash)window.history.replaceState({},'',url.pathname+(url.search||''));
+  if(type==='recovery'&&token.length>=20&&token.length<=4096)openPasswordRecoveryUpdate(token);
+  else openPasswordRecoveryRequest('That reset link is missing or expired. Request a fresh password-reset email.');
+}
+async function exportPersonalData(){
+  const button=$('#exportDataButton'),status=$('#exportDataStatus');if(button){button.disabled=true;button.textContent='Preparing export…';}
+  try{
+    const payload={
+      schemaVersion:1,exportedAt:new Date().toISOString(),
+      exportScope:appUser&&remoteConnected?'signed-in Compass account and visible source context':'browser-local demo only',
+      account:appUser?{id:appUser.id,email:appUser.email||null}:null,
+      compass:{goals:state.goals,activity:state.events.map(e=>({...e,note:displayEventNote(e.note)})),preferences:{currentFocusGoalId:state.currentFocus,planningHorizon:state.mode,manualPriority:state.override,theme:state.theme}},
+      visiblePandoraContext:appUser&&remoteConnected?sourceSnapshot:null,
+      email:{connections:[],signals:[]},
+      privacyNote:'This export excludes provider refresh tokens, access tokens, server environment variables, and OAuth signing/encryption secrets.'
+    };
+    if(appUser&&remoteConnected){
+      const mail=await apiRequest('/api/email');
+      payload.email.connections=(mail.connections||[]).map(c=>({id:c.id,provider:c.provider,account_email:c.account_email,display_name:c.display_name,granted_scopes:c.granted_scopes,status:c.status,last_synced_at:c.last_synced_at,last_error:c.last_error,created_at:c.created_at,updated_at:c.updated_at}));
+      payload.email.signals=mail.signals||[];
+    }
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+    const objectUrl=window.URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=objectUrl;link.download='goal-compass-export-'+localDateKey()+'.json';link.style.display='none';document.body.appendChild(link);link.click();link.remove();
+    window.setTimeout(()=>window.URL.revokeObjectURL(objectUrl),1000);
+    if(status)status.textContent='Export prepared. It includes only data returned to this signed-in session; provider credentials are excluded.';
+  }catch(err){if(status)status.textContent='Export was not completed: '+err.message;}
+  finally{if(button){button.disabled=false;button.textContent='Export my data as JSON';}}
+}
 function consumeEmailOAuthReturn(){
   const url=new URL(window.location.href);const result=url.searchParams.get('emailConnection');if(!result)return;
   const reason=url.searchParams.get('reason')||'';url.searchParams.delete('emailConnection');url.searchParams.delete('reason');window.history.replaceState({},'',url.pathname+(url.search?url.search:'')+url.hash);
@@ -476,7 +525,10 @@ load();renderAll();
 
 function chooseAuthMode(mode){
   const m=mode==='signup'?'signup':'signin';
-  $$('[data-auth-mode]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.authMode===m)));
+  $('#authTitle').textContent='Connect your compass.';
+  $('#authTabs').hidden=false;$('#authForm').hidden=false;$('#recoveryRequestPanel').hidden=true;$('#recoveryUpdatePanel').hidden=true;$('#authCancel').hidden=false;
+  $('#forgotPassword').hidden=m==='signup';
+  $('[data-auth-mode]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.authMode===m)));
   $('#authSubmit').textContent=m==='signup'?'Create account':'Sign in securely';
   $('#authPassword').autocomplete=m==='signup'?'new-password':'current-password';
   $('#authMessage').textContent=m==='signup'?'Use an email address you can confirm. Supabase may require email verification before the first sign-in.':'Sign in to load private goals and live Pandora source signals.';
@@ -488,7 +540,35 @@ async function signOutAccount(){
   renderAll();renderConnections();setView('compass');setConnectionLabel('Local demo · not synced',false);
 }
 $('#accountButton').addEventListener('click',()=>{if(appUser){signOutAccount();return;}$('#authModal').hidden=false;chooseAuthMode('signin');$('#authEmail').focus();});
-$('#authCancel').addEventListener('click',()=>{$('#authModal').hidden=true;});
+$('#authCancel').addEventListener('click',()=>{$('#authModal').hidden=true;recoveryAccessToken=null;});
+$('#forgotPassword').addEventListener('click',()=>openPasswordRecoveryRequest());
+$('#recoveryBackRequest').addEventListener('click',()=>chooseAuthMode('signin'));
+$('#recoveryRequestForm').addEventListener('submit',async e=>{
+  e.preventDefault();const button=$('#recoveryRequestSubmit');button.disabled=true;button.textContent='Requesting…';
+  try{
+    const response=await fetch('/api/auth',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'password-recovery',email:$('#recoveryEmail').value.trim()})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'Password recovery is temporarily unavailable.');
+    $('#authMessage').textContent=data.message||'If an account exists for that address, a password-reset email will be sent.';
+  }catch(err){$('#authMessage').textContent=err.message||'Password recovery is temporarily unavailable.';}
+  finally{button.disabled=false;button.textContent='Send reset email';}
+});
+$('#recoveryUpdateForm').addEventListener('submit',async e=>{
+  e.preventDefault();const password=$('#recoveryNewPassword').value,confirm=$('#recoveryConfirmPassword').value,button=$('#recoveryUpdateSubmit');
+  if(password!==confirm){$('#authMessage').textContent='The two passwords do not match.';$('#recoveryConfirmPassword').focus();return;}
+  if(!recoveryAccessToken){$('#authMessage').textContent='This reset link is unavailable. Request a new password-reset email.';return;}
+  button.disabled=true;button.textContent='Updating…';
+  try{
+    const response=await fetch('/api/auth',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'set-recovered-password',recoveryAccessToken,newPassword:password})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'The password could not be updated.');
+    recoveryAccessToken=null;$('#recoveryNewPassword').value='';$('#recoveryConfirmPassword').value='';
+    const url=new URL(window.location.href);url.searchParams.delete('recovery');window.history.replaceState({},'',url.pathname+(url.search||''));
+    chooseAuthMode('signin');$('#authMessage').textContent='Password updated. Sign in with your new password.';
+  }catch(err){$('#authMessage').textContent=err.message||'The password could not be updated.';}
+  finally{button.disabled=false;button.textContent='Update password';}
+});
+$('#exportDataButton').addEventListener('click',exportPersonalData);
 $('#authClose').addEventListener('click',()=>{$('#authModal').hidden=true;});
 $$('[data-auth-mode]').forEach(b=>b.addEventListener('click',()=>chooseAuthMode(b.dataset.authMode)));
 $('#authModal').addEventListener('click',e=>{if(e.target===$('#authModal'))$('#authModal').hidden=true;});
@@ -535,6 +615,7 @@ $('#authForm').addEventListener('submit',async e=>{
 });
 
 async function startCompass(){
+  consumePasswordRecoveryReturn();
   consumeEmailOAuthReturn();
   await bootstrapSession();
   if($('#page-connections').classList.contains('active')&&appUser&&remoteConnected)await loadEmailWorkspace();
