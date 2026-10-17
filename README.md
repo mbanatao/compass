@@ -82,7 +82,7 @@ Run the dependency-free source parse checks with:
 node scripts/check.mjs
 ```
 
-GitHub Actions runs this validation on pushes to `main` and on pull requests.
+GitHub Actions runs this validation on pushes to `main` and `production-readiness-foundation`, on pull requests, or manually through **Actions → Goal Compass validation → Run workflow**. The connected GitHub API currently reports no workflow runs, so repository CI execution still needs confirmation.
 
 ## Scoring and evidence limits
 
