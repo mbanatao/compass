@@ -37,7 +37,7 @@ html[data-theme="light"]{color-scheme:light;--bg:#f1efe8;--surface:#faf9f5;--sur
 .email-signal{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;border-top:1px solid var(--line);padding:13px 0;align-items:start}
 .email-signal h3{font-size:12px;font-weight:500;margin:0 0 4px;overflow-wrap:anywhere}
 .email-signal p{font-size:10px;color:var(--muted);line-height:1.5;margin:4px 0}
-.email-signal-meta{font-size:9px;color:var(--muted)}
+.email-signal-meta{font-size:9px;color:var(--muted)}.email-goal-select{display:block;width:100%;max-width:340px;min-height:34px;margin-top:5px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:7px;font-size:10px}
 .email-signal-actions{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap}
 .email-signal-actions button{min-height:31px;padding:0 8px;font-size:9px}
 .email-status{font-size:10px;color:var(--muted);line-height:1.6;margin:9px 0 0;overflow-wrap:anywhere}
@@ -299,10 +299,11 @@ function renderConnections(){
     const when=s.received_at?new Date(s.received_at).toLocaleString():'Date unavailable';
     const account=connections.find(c=>c.id===s.connection_id);
     const openLink=s.action_url&&/^https:\/\//i.test(s.action_url)?'<a class="text-link" href="'+escapeHTML(s.action_url)+'" target="_blank" rel="noopener noreferrer">Open email ↗</a>':'';
+    const goalPicker='<label style="display:block;margin-top:9px;font-size:9px;color:var(--muted)">Link to goal (confirm before it affects priority)<select class="email-goal-select" data-email-goal data-signal-id="'+escapeHTML(s.id)+'"><option value="">Not linked to a goal</option>'+state.goals.map(g=>'<option value="'+escapeHTML(g.id)+'" '+(s.goal_id===g.id?'selected':'')+'>'+escapeHTML(g.name)+'</option>').join('')+'</select></label>';
     const actions=s.review_state==='needs_review'?'<button type="button" class="secondary-btn" data-email-review="confirmed" data-signal-id="'+escapeHTML(s.id)+'">Confirm</button><button type="button" class="secondary-btn" data-email-review="dismissed" data-signal-id="'+escapeHTML(s.id)+'">Dismiss</button>':
       s.review_state==='confirmed'?'<button type="button" class="secondary-btn" data-email-review="completed" data-signal-id="'+escapeHTML(s.id)+'">Mark done</button><button type="button" class="secondary-btn" data-email-review="needs_review" data-signal-id="'+escapeHTML(s.id)+'">Reopen</button>':
       '<button type="button" class="secondary-btn" data-email-review="needs_review" data-signal-id="'+escapeHTML(s.id)+'">Review again</button>';
-    return '<article class="email-signal"><div><h3>'+escapeHTML(s.subject||'(No subject)')+'</h3><div class="email-signal-meta">'+escapeHTML(label)+' · Confidence '+confidence+'/5 · '+escapeHTML(stateLabel)+'</div><p>'+escapeHTML(s.evidence_reason||'No explanation available.')+'</p><div class="email-signal-meta">'+escapeHTML(s.sender_name||'Unknown sender')+(s.sender_email?' · '+escapeHTML(s.sender_email):'')+' · '+escapeHTML(when)+(account?' · '+escapeHTML(account.account_email):'')+'</div>'+(s.due_at?'<p>Possible due date: '+escapeHTML(new Date(s.due_at).toLocaleDateString())+'</p>':'')+openLink+'</div><div class="email-signal-actions">'+actions+'</div></article>';
+    return '<article class="email-signal"><div><h3>'+escapeHTML(s.subject||'(No subject)')+'</h3><div class="email-signal-meta">'+escapeHTML(label)+' · Confidence '+confidence+'/5 · '+escapeHTML(stateLabel)+'</div><p>'+escapeHTML(s.evidence_reason||'No explanation available.')+'</p><div class="email-signal-meta">'+escapeHTML(s.sender_name||'Unknown sender')+(s.sender_email?' · '+escapeHTML(s.sender_email):'')+' · '+escapeHTML(when)+(account?' · '+escapeHTML(account.account_email):'')+'</div>'+(s.due_at?'<p>Possible due date: '+escapeHTML(new Date(s.due_at).toLocaleDateString())+'</p>':'')+openLink+goalPicker+'</div><div class="email-signal-actions">'+actions+'</div></article>';
   }).join(''):'<div class="empty-state">No email signals yet. Connect a mailbox and choose Sync now. Only recent inbox messages are checked.</div>';
 }
 function consumeEmailOAuthReturn(){
@@ -358,12 +359,22 @@ $('#newGoal').addEventListener('click',openNewGoal);
 $('#emailAccountGrid').addEventListener('click',async e=>{
   const connect=e.target.closest('[data-email-connect]'),sync=e.target.closest('[data-email-sync]'),disconnect=e.target.closest('[data-email-disconnect]');
   if(connect){if(!appUser){$('#authModal').hidden=false;chooseAuthMode('signin');return;}const b=connect;b.disabled=true;b.textContent='Opening consent…';try{const d=await apiRequest('/api/email',{action:'connect',provider:b.dataset.emailConnect,email:b.dataset.accountEmail});window.location.assign(d.authorizationUrl);}catch(err){$('#emailWorkspaceStatus').textContent=err.message;b.disabled=false;b.textContent='Connect account';}return;}
-  if(sync){sync.disabled=true;sync.textContent='Syncing…';try{const d=await apiRequest('/api/email',{action:'sync',connectionId:sync.dataset.emailSync});await loadEmailWorkspace();$('#emailWorkspaceStatus').textContent='Synced '+d.accountEmail+' · '+d.count+' recent messages checked at '+new Date(d.syncedAt).toLocaleTimeString()+'.';}catch(err){$('#emailWorkspaceStatus').textContent='Email sync failed: '+err.message;sync.disabled=false;sync.textContent='Sync now';}return;}
-  if(disconnect){if(!confirm('Disconnect '+disconnect.closest('.email-card').querySelector('h3').textContent+'? Compass will no longer sync this mailbox, and its saved email signals will be removed.'))return;disconnect.disabled=true;try{await apiRequest('/api/email',{action:'disconnect',connectionId:disconnect.dataset.emailDisconnect});await loadEmailWorkspace();}catch(err){$('#emailWorkspaceStatus').textContent='Could not disconnect: '+err.message;disconnect.disabled=false;}return;}
+  if(sync){sync.disabled=true;sync.textContent='Syncing…';try{const d=await apiRequest('/api/email',{action:'sync',connectionId:sync.dataset.emailSync});await loadEmailWorkspace();await loadEmailScoreSignals();renderCompass();$('#emailWorkspaceStatus').textContent='Synced '+d.accountEmail+' · '+d.count+' recent messages checked at '+new Date(d.syncedAt).toLocaleTimeString()+'.';}catch(err){$('#emailWorkspaceStatus').textContent='Email sync failed: '+err.message;sync.disabled=false;sync.textContent='Sync now';}return;}
+  if(disconnect){if(!confirm('Disconnect '+disconnect.closest('.email-card').querySelector('h3').textContent+'? Compass will no longer sync this mailbox, and its saved email signals will be removed.'))return;disconnect.disabled=true;try{await apiRequest('/api/email',{action:'disconnect',connectionId:disconnect.dataset.emailDisconnect});await loadEmailWorkspace();await loadEmailScoreSignals();renderCompass();}catch(err){$('#emailWorkspaceStatus').textContent='Could not disconnect: '+err.message;disconnect.disabled=false;}return;}
+});
+$('#emailSignalList').addEventListener('change',async e=>{
+  const select=e.target.closest('[data-email-goal]');if(!select)return;select.disabled=true;
+  const signal=emailWorkspace.signals.find(s=>s.id===select.dataset.signalId);
+  try{
+    await apiRequest('/api/email',{action:'review_signal',signalId:select.dataset.signalId,reviewState:signal&&signal.review_state||'needs_review',goalId:select.value||null});
+    await loadEmailWorkspace();await loadEmailScoreSignals();renderCompass();
+    $('#emailWorkspaceStatus').textContent='Goal link saved. A signal affects ranking only after you confirm it.';
+  }catch(err){$('#emailWorkspaceStatus').textContent='Could not link the email to this goal: '+err.message;select.disabled=false;}
 });
 $('#emailSignalList').addEventListener('click',async e=>{
   const b=e.target.closest('[data-email-review]');if(!b)return;b.disabled=true;
-  try{await apiRequest('/api/email',{action:'review_signal',signalId:b.dataset.signalId,reviewState:b.dataset.emailReview});await loadEmailWorkspace();}
+  const signal=emailWorkspace.signals.find(s=>s.id===b.dataset.signalId);
+  try{await apiRequest('/api/email',{action:'review_signal',signalId:b.dataset.signalId,reviewState:b.dataset.emailReview,goalId:signal&&signal.goal_id||null});await loadEmailWorkspace();await loadEmailScoreSignals();renderCompass();}
   catch(err){$('#emailWorkspaceStatus').textContent='Could not save the review decision: '+err.message;b.disabled=false;}
 });
 $('#refreshEmailWorkspace').addEventListener('click',()=>loadEmailWorkspace());
