@@ -20,4 +20,4 @@ jobs:
       - name: Parse browser and server JavaScript
         run: node scripts/check.mjs
       - name: Test server-side security contracts
-        run: node --test tests/security-contracts.test.cjs
+        run: node --test tests/*.test.cjs
