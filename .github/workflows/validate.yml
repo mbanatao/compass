@@ -2,7 +2,7 @@ name: Goal Compass validation
 
 on:
   push:
-    branches: [main]
+    branches: [main, production-readiness-foundation]
   pull_request:
 
 permissions:
