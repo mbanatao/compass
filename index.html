@@ -69,7 +69,7 @@ html[data-theme="light"]{color-scheme:light;--bg:#f1efe8;--surface:#faf9f5;--sur
 <div class="section-row"><div><div class="eyebrow">Your next moves</div><h2>Suggested priorities</h2></div><button type="button" class="text-link" data-go-view="goals">Adjust goals ↗</button></div>
 <div class="daily-plan-grid" id="dailyPlan" aria-live="polite"><div class="compact-panel daily-empty"><div class="empty-state">Preparing your daily plan…</div></div></div>
 <div class="daily-layout">
-<section class="compact-panel"><div class="eyebrow">Quick reflection</div><h2 style="margin-top:5px">Check in with yourself.</h2><p class="muted-copy">This is self-reported context, not passive tracking. Your latest check-in is saved as an activity record.</p>
+<section class="compact-panel"><div class="eyebrow">Quick reflection</div><h2 style="margin-top:5px">Check in with yourself.</h2><p class="muted-copy">This is self-reported context, not passive tracking. If you select a goal and enter a blocker, Compass records a separate blocker event that can raise that goal’s urgency. Energy and available time alone do not change scores.</p>
 <form class="daily-form" id="dailyCheckinForm">
 <div class="daily-form-pair"><div class="field"><label for="checkinEnergy">Energy today</label><select id="checkinEnergy"><option value="1">1 · Very low</option><option value="2">2 · Low</option><option value="3" selected>3 · Steady</option><option value="4">4 · Good</option><option value="5">5 · Excellent</option></select></div><div class="field"><label for="checkinCapacity">Time available for focused work</label><select id="checkinCapacity"><option value="30 minutes">30 minutes</option><option value="1 hour" selected>1 hour</option><option value="2 hours">2 hours</option><option value="4 hours">4 hours</option><option value="6+ hours">6+ hours</option></select></div></div>
 <div class="field"><label for="checkinGoal">Goal this check-in relates to (optional)</label><select id="checkinGoal"><option value="">No specific goal</option></select></div>
@@ -435,25 +435,25 @@ function consumePasswordRecoveryReturn(){
 async function exportPersonalData(){
   const button=$('#exportDataButton'),status=$('#exportDataStatus');if(button){button.disabled=true;button.textContent='Preparing export…';}
   try{
-    const payload={
-      schemaVersion:1,exportedAt:new Date().toISOString(),
-      exportScope:appUser&&remoteConnected?'signed-in Compass account and visible source context':'browser-local demo only',
-      account:appUser?{id:appUser.id,email:appUser.email||null}:null,
-      compass:{goals:state.goals,activity:state.events.map(e=>({...e,note:displayEventNote(e.note)})),preferences:{currentFocusGoalId:state.currentFocus,planningHorizon:state.mode,manualPriority:state.override,theme:state.theme}},
-      visiblePandoraContext:appUser&&remoteConnected?sourceSnapshot:null,
-      email:{connections:[],signals:[]},
-      privacyNote:'This export excludes provider refresh tokens, access tokens, server environment variables, and OAuth signing/encryption secrets.'
-    };
+    let payload;
     if(appUser&&remoteConnected){
-      const mail=await apiRequest('/api/email');
-      payload.email.connections=(mail.connections||[]).map(c=>({id:c.id,provider:c.provider,account_email:c.account_email,display_name:c.display_name,granted_scopes:c.granted_scopes,status:c.status,last_synced_at:c.last_synced_at,last_error:c.last_error,created_at:c.created_at,updated_at:c.updated_at}));
-      payload.email.signals=mail.signals||[];
+      payload=await apiRequest('/api/export');
+      payload.exportScope='Signed-in Compass records plus the bounded Pandora source snapshot currently visible to this account.';
+      payload.visiblePandoraContextSnapshot=sourceSnapshot;
+    }else{
+      payload={
+        schemaVersion:1,exportedAt:new Date().toISOString(),exportScope:'browser-local demo only',
+        account:null,
+        compass:{goals:state.goals,activity:state.events.map(e=>({...e,note:displayEventNote(e.note)})),preferences:{currentFocusGoalId:state.currentFocus,planningHorizon:state.mode,manualPriority:state.override,theme:state.theme}},
+        visiblePandoraContextSnapshot:null,email:{connections:[],signals:[]},
+        privacyNote:'This local-demo export contains only browser-local data and excludes provider credentials.'
+      };
     }
     const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
     const objectUrl=window.URL.createObjectURL(blob),link=document.createElement('a');
     link.href=objectUrl;link.download='goal-compass-export-'+localDateKey()+'.json';link.style.display='none';document.body.appendChild(link);link.click();link.remove();
     window.setTimeout(()=>window.URL.revokeObjectURL(objectUrl),1000);
-    if(status)status.textContent='Export prepared. It includes only data returned to this signed-in session; provider credentials are excluded.';
+    if(status)status.textContent='Export prepared. Signed-in exports include paginated Compass records and email metadata; provider credentials are excluded.';
   }catch(err){if(status)status.textContent='Export was not completed: '+err.message;}
   finally{if(button){button.disabled=false;button.textContent='Export my data as JSON';}}
 }
@@ -569,9 +569,9 @@ $('#recoveryUpdateForm').addEventListener('submit',async e=>{
   finally{button.disabled=false;button.textContent='Update password';}
 });
 $('#exportDataButton').addEventListener('click',exportPersonalData);
-$('#authClose').addEventListener('click',()=>{$('#authModal').hidden=true;});
+$('#authClose').addEventListener('click',()=>{$('#authModal').hidden=true;recoveryAccessToken=null;});
 $$('[data-auth-mode]').forEach(b=>b.addEventListener('click',()=>chooseAuthMode(b.dataset.authMode)));
-$('#authModal').addEventListener('click',e=>{if(e.target===$('#authModal'))$('#authModal').hidden=true;});
+$('#authModal').addEventListener('click',e=>{if(e.target===$('#authModal')){$('#authModal').hidden=true;recoveryAccessToken=null;}});
 $('#newGoal').addEventListener('click',openNewGoal);
 $('#emailAccountGrid').addEventListener('click',async e=>{
   const connect=e.target.closest('[data-email-connect]'),sync=e.target.closest('[data-email-sync]'),disconnect=e.target.closest('[data-email-disconnect]');
