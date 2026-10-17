@@ -12,7 +12,9 @@ A responsive Goal Compass web app for navigating priorities, progress, and next 
 
 - Compass directions, current focus, and deterministic priority scoring.
 - Daily Command Center with up to three evidence-explained next actions, explicit focus/start/defer controls, and date-bound deferrals.
-- Self-reported daily check-in for energy, available focus time, attention, wins, and blockers; check-ins are recorded as activity and do not silently change goal scores.
+- Self-reported daily check-in for energy, available focus time, attention, wins, and blockers; the check-in itself is not a completion claim, and an explicitly reported blocker is recorded separately.
+- Self-service password-reset request and password-update flow; the production redirect must be allowlisted in Supabase Auth and the reset email flow still requires live verification.
+- On-demand JSON export of Compass goals, activity, preferences, visible Pandora context, and email signal metadata; provider credentials are excluded.
 - Seven-day review of logged progress, blockers, check-ins, and explicitly recorded time; missing entries are not interpreted as proof that nothing happened.
 - Today, This week, and North Star planning horizons.
 - User-owned goals with direction, success definition, next action, progress, importance, urgency, impact, momentum, evidence confidence, status, and optional deadline.
