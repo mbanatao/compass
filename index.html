@@ -427,10 +427,12 @@ $('#dailyPlan').addEventListener('click',async e=>{
       $('#dailyToast').textContent=g.name+' was removed from today’s suggestions. You can still find it under Goals.';
     }else if(action==='focus'||action==='start'){
       state.currentFocus=id;state.override={id:id,date:localDateKey()};save();
-      await persistSettings();
+      const settingsSaved=await persistSettings();
       if(action==='start')await recordDailyEvent(id,'Action started','Started next action: '+g.nextAction,null);
       else await recordDailyEvent(id,'Priority override','User chose '+g.name+' as today’s priority from the daily plan.',null);
-      renderAll();$('#dailyToast').textContent=action==='start'?'Started and logged: '+g.nextAction:g.name+' is now your chosen priority for today.';
+      renderAll();
+      const actionMessage=action==='start'?'Started and logged: '+g.nextAction:g.name+' is now your chosen priority for today.';
+      $('#dailyToast').textContent=settingsSaved?actionMessage:actionMessage+' The action was logged, but the priority preference did not sync; check the account connection.';
     }
   }catch(err){$('#dailyToast').textContent='The action could not be fully saved: '+err.message;renderToday();}
 });
@@ -441,10 +443,11 @@ $('#dailyCheckinForm').addEventListener('submit',async e=>{
   const note='[daily-check-in:'+localDateKey()+'] Energy '+energy+'/5 | Focus time available: '+capacity+' | Attention: '+(focus||'Not specified')+' | Win: '+(win||'Not specified')+' | Blocker: '+(blocker||'Not specified');
   try{
     const synced=await recordDailyEvent(goalId,'Check-in',note,null);
-    if(blocker)await recordDailyEvent(goalId,'Blocker','Blocker reported in daily check-in: '+blocker,null);
+    let blockerSaved=true;
+    if(blocker){try{await recordDailyEvent(goalId,'Blocker','Blocker reported in daily check-in: '+blocker,null);}catch(blockerError){blockerSaved=false;}}
     $('#dailyCheckinForm').reset();$('#checkinEnergy').value=energy;$('#checkinCapacity').value=capacity;populateCheckinGoals();
-    $('#dailyCheckinStatus').textContent='Check-in recorded '+(synced?'to your signed-in account':'in this browser only')+'. The entries reflect what you reported.';
-    $('#dailyToast').textContent=blocker?'Check-in recorded. The blocker is also logged for review.':'Check-in recorded.';
+    $('#dailyCheckinStatus').textContent='Check-in recorded '+(synced?'to your signed-in account':'in this browser only')+'. The entries reflect what you reported.'+(blocker&&!blockerSaved?' The check-in was saved, but its separate blocker entry did not sync.':'');
+    $('#dailyToast').textContent=blocker?(blockerSaved?'Check-in recorded. The blocker is also logged for review.':'Check-in recorded; the blocker needs a separate retry.'):'Check-in recorded.';
     renderAll();
   }catch(err){$('#dailyCheckinStatus').textContent='Could not confirm that the check-in was saved: '+err.message;$('#dailyToast').textContent='Check-in save needs attention. Review the account connection before retrying.';}
   finally{button.disabled=false;button.textContent='Save today’s check-in';}
