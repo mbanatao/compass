@@ -331,8 +331,8 @@ function chooseAuthMode(mode){
 async function signOutAccount(){
   try{await fetch('/api/auth',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'signout'})});}
   catch(e){setConnectionLabel('Sign-out uncertain',false);return;}
-  appUser=null;remoteConnected=false;state=defaultState();load();sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};
-  renderAll();setConnectionLabel('Local demo · not synced',false);
+  appUser=null;remoteConnected=false;emailWorkspace={providers:{},connections:[],signals:[]};emailWorkspaceLoading=false;state=defaultState();load();sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};
+  renderAll();renderConnections();setView('compass');setConnectionLabel('Local demo · not synced',false);
 }
 $('#accountButton').addEventListener('click',()=>{if(appUser){signOutAccount();return;}$('#authModal').hidden=false;chooseAuthMode('signin');$('#authEmail').focus();});
 $('#authCancel').addEventListener('click',()=>{$('#authModal').hidden=true;});
