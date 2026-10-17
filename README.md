@@ -1,32 +1,88 @@
 # Pandora Goal Compass
 
-A responsive, browser-based Goal Compass prototype: a personal navigation instrument for priorities, progress, and next actions.
+A responsive Goal Compass web app for navigating priorities, progress, and next actions. The frontend is a static HTML application; the private-data endpoints run as Vercel serverless functions.
 
-## Features
+## Live app
 
-- Compass-style view showing four goal directions and the difference between current focus and recommended goal.
-- Deterministic, weighted priority scoring for Today, This week, and North star horizons.
-- Editable goal definitions, success descriptions, next actions, progress, urgency, importance, impact, momentum, evidence confidence, and optional deadlines.
-- Temporary, user-directed priority override for the local day.
-- Local activity journal and explanation of the scoring model.
-- Dark/light themes and responsive mobile layout.
-- Local browser persistence through `localStorage`; no credentials, analytics, API keys, or backend connections are required.
+- Production: https://pandora-goal-compass-mbanatao.vercel.app
+- Repository: https://github.com/mbanatao/compass
 
-## Run locally
+## Current capabilities
 
-Open `index.html` in a modern browser, or serve the repository directory with any static web server.
+- Compass directions, current focus, and deterministic priority scoring.
+- Today, This week, and North Star planning horizons.
+- User-owned goals with direction, success definition, next action, progress, importance, urgency, impact, momentum, evidence confidence, status, and optional deadline.
+- User-directed priority override for the local day.
+- Manual activity journal with provenance; raw activity is not promoted to permanent Memory automatically.
+- Explicit links from personal goals to visible Pandora projects.
+- Read-only, best-effort source context from permitted Pandora project/task/decision records, promoted lessons, processed integration-event metadata, and project experience projections.
+- Source freshness/status and record counts displayed separately from user-entered activity.
+- Private Supabase Auth sessions held in Secure, HttpOnly cookies; database requests use the signed-in user's access token so Supabase Row Level Security continues to apply.
+- Per-user Supabase persistence for goals, settings, activity, and goal-project links.
+- Responsive mobile layout and dark/light themes.
 
-## Deploy on Vercel
+## Data flow
 
-This is a static HTML application. Connect the repository `mbanatao/compass` to Vercel with no build command and the repository root as the output root.
+```text
+Browser UI
+  -> same-origin /api/auth (sign-up, sign-in, session, sign-out)
+  -> HttpOnly session cookie
+  -> same-origin /api/compass
+  -> Supabase Auth + PostgREST using the signed-in user's JWT
+  -> Row Level Security
+  -> per-user Goal Compass tables + permitted Pandora source records
+  -> deterministic scoring + displayed evidence
+```
 
-## Important prototype limits
+The Supabase project URL and publishable key are configured as Vercel environment variables and used server-side. No service-role key is needed or embedded in the browser. Do not move Supabase secrets into `index.html`.
 
-- Starting goal names, scores, and next actions are illustrative. Edit them before relying on recommendations.
-- Data stays in the browser/device that created it. There is no account, cloud sync, Supabase, or Pandora Memory integration in this version.
-- Activity is user-entered; the app does not automatically observe projects, calendars, or phone sensors.
-- The compass bearing is a visual comparison between goal directions. It is not GPS or a measurement of real-world behavior.
+## Supabase schema
 
-## Scoring
+Migration `goal_compass_personal_data_and_rls` creates:
 
-Each active goal is scored deterministically from five editable 1–5 factors: importance, urgency, impact, momentum, and evidence confidence. The weights depend on the selected planning horizon. An optional near-term deadline raises effective urgency. Paused and completed goals are excluded from the recommendation. A valid manual priority overrides the calculated winner for the current local day in Today mode, while the calculated score remains visible.
+- `goal_compass_goals`
+- `goal_compass_activity_events`
+- `goal_compass_settings`
+- `goal_compass_goal_project_links`
+
+Each table uses Row Level Security. Personal goals remain separate from Pandora's project/task records; linking a project is an explicit user action. The application only receives source rows that the signed-in user's current Supabase permissions allow.
+
+## Configure Vercel
+
+Project name: `pandora-goal-compass-mbanatao`
+
+Required environment variables (server-side only):
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY` (or legacy `SUPABASE_ANON_KEY`)
+
+Runtime functions: `api/auth.js`, `api/compass.js`, `api/health.js`.
+
+The project was deployed from GitHub source directly because the connected Vercel Git provider reported that it did not have access to this repo at project-link time. Consequently, future pushes may not auto-deploy until Vercel's GitHub integration has access to `mbanatao/compass`.
+
+## Local run and source validation
+
+Open `index.html` in a modern browser for local/demo mode. Authenticated cloud mode requires the Vercel API routes and the server environment variables.
+
+Run the dependency-free source parse checks with:
+
+```sh
+node scripts/check.mjs
+```
+
+GitHub Actions runs this validation on pushes to `main` and on pull requests.
+
+## Scoring and evidence limits
+
+Active goals are scored deterministically from five editable 1–5 factors: importance, urgency, impact, momentum, and evidence confidence. The weights depend on the chosen horizon. A near-term deadline raises effective urgency. Paused and completed goals are excluded. A current-day user override wins in Today mode, with its manual origin labeled explicitly.
+
+When a goal is explicitly linked to visible Pandora projects, currently available task/blocker/needs-you and processed-event signals can adjust the goal's urgency and momentum. Those heuristics are intentionally small and inspectable. They do not establish what the user has actually done in the physical world.
+
+## Not connected yet
+
+- Calendar, email, health, finance, or other personal-life provider integrations.
+- Pandora Memory API integration for durable learned lessons or cross-context context packs.
+- Automatic phone sensor/gyroscope orientation.
+- Background activity tracking or automatic task-completion detection.
+- Automatic GitHub-to-Vercel redeployment until repository access is granted.
+
+The four default goal names and their factor values are user-editable starter inputs, not claims about the user's life. Recommendations should not be treated as authoritative if source permissions fail, linked data is stale, or a goal has insufficient evidence.
