@@ -116,7 +116,7 @@ const defaultGoals=[
 {id:'finance',name:'FINANCE',direction:180,description:'Keep cash flow, obligations, and business economics visible.',nextAction:'Review the highest-value open financial loop.',importance:4,urgency:4,impact:4,momentum:3,confidence:3,progress:42,status:'active',deadline:''},
 {id:'people',name:'PEOPLE',direction:270,description:'Maintain the relationships and trust that matter over the long term.',nextAction:'Reach out to one important person.',importance:3,urgency:2,impact:4,momentum:3,confidence:4,progress:70,status:'active',deadline:''}
 ];
-const defaultState=()=>({goals:defaultGoals.map(g=>({...g})),events:[],currentFocus:'finance',mode:'today',override:null,theme:'dark',actionStarted:null});let state=defaultState();let editingId=null;let appUser=null;let remoteConnected=false;let sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};let emailWorkspace={providers:{},connections:[],signals:[]};let emailWorkspaceLoading=false;let emailScoreSignals=[];const requestedEmailAccounts=[{email:'joven_ong@hotmail.com',provider:'microsoft'},{email:'joven.ong23@gmail.com',provider:'google'},{email:'jovenongz@gmail.com',provider:'google'},{email:'unclejose0@gmail.com',provider:'google'},{email:'markjohnsonbanatao888@gmail.com',provider:'google'}];
+const defaultState=()=>({goals:defaultGoals.map(g=>({...g})),events:[],currentFocus:'finance',mode:'today',override:null,theme:'dark',actionStarted:null});let state=defaultState();let editingId=null;let appUser=null;let remoteConnected=false;let sourceSnapshot={syncedAt:null,projects:{available:false,items:[]},tasks:{available:false,items:[]},decisions:{available:false,items:[]},lessons:{available:false,items:[]},externalEvents:{available:false,items:[]},experience:{available:false,items:[]}};let emailWorkspace={providers:{},connections:[],signals:[]};let emailWorkspaceLoading=false;let emailScoreSignals=[];let emailScoreSignalsAvailable=false;let emailScoreSignalsSyncedAt=null;const requestedEmailAccounts=[{email:'joven_ong@hotmail.com',provider:'microsoft'},{email:'joven.ong23@gmail.com',provider:'google'},{email:'jovenongz@gmail.com',provider:'google'},{email:'unclejose0@gmail.com',provider:'google'},{email:'markjohnsonbanatao888@gmail.com',provider:'google'}];
 function load(){try{const raw=localStorage.getItem(STORE);if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.goals)&&parsed.goals.length){state={...defaultState(),...parsed,goals:parsed.goals};}}}catch(e){console.warn('Goal Compass local data could not be loaded.',e)}if(!state.goals.some(g=>g.id===state.currentFocus))state.currentFocus=state.goals[0]?.id||'build';}
 function save(){
   // Keep browser demo state separate from authenticated Supabase state; never overwrite a local demo with private-account data.
@@ -166,9 +166,12 @@ function effectiveFactor(g,k){
   if(k==='momentum')v+=signals.momentumBoost;
   return Math.min(5,v);
 }
-function scoreGoal(g){const w=weights[state.mode]||weights.today;return Math.round(Object.keys(w).reduce((sum,k)=>sum+(effectiveFactor(g,k)/5)*w[k],0));}
-function localDateKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function overrideValid(){return state.mode==='today'&&state.override&&state.override.date===localDateKey()&&state.goals.some(g=>g.id===state.override.id&&g.status==='active');}
+function scoreForHorizon(g,mode){const w=weights[mode]||weights.today;return Math.round(Object.keys(w).reduce((sum,k)=>sum+(effectiveFactor(g,k)/5)*w[k],0));}
+function scoreGoal(g){return scoreForHorizon(g,state.mode);}
+function localDateKeyFor(value){const d=value instanceof Date?value:new Date(value);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function localDateKey(){return localDateKeyFor(new Date());}
+function currentDayOverrideValid(){return !!(state.override&&state.override.date===localDateKey()&&state.goals.some(g=>g.id===state.override.id&&g.status==='active'));}
+function overrideValid(){return state.mode==='today'&&currentDayOverrideValid();}
 function ranked(){return state.goals.filter(g=>g.status==='active').map(g=>({...g,score:scoreGoal(g)})).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));}
 function recommended(){const list=ranked();if(overrideValid()){const o=list.find(g=>g.id===state.override.id);if(o)return {...o,manualOverride:true};}return list[0]||null;}
 function getGoal(id){return state.goals.find(g=>g.id===id)}function normalizeName(s){return String(s||'').trim().slice(0,35)}function escapeHTML(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -195,9 +198,9 @@ async function apiRequest(path,payload){
   return data;
 }
 async function persistSettings(){
-  if(!appUser||!remoteConnected)return;
-  try{await apiRequest('/api/compass',{action:'save_settings',currentFocusGoalId:getGoal(state.currentFocus)?state.currentFocus:null,planningHorizon:state.mode,overrideGoalId:state.override&&state.override.id||null,overrideDate:state.override&&state.override.date||null,theme:state.theme});}
-  catch(e){setConnectionLabel('Sync issue · retry',false);const toast=$('#compassToast');if(toast)toast.textContent='Settings were not synced: '+e.message;}
+  if(!appUser||!remoteConnected)return true;
+  try{await apiRequest('/api/compass',{action:'save_settings',currentFocusGoalId:getGoal(state.currentFocus)?state.currentFocus:null,planningHorizon:state.mode,overrideGoalId:state.override&&state.override.id||null,overrideDate:state.override&&state.override.date||null,theme:state.theme});return true;}
+  catch(e){setConnectionLabel('Sync issue · retry',false);const toast=$('#compassToast');if(toast)toast.textContent='Settings were not synced: '+e.message;return false;}
 }
 async function loadRemoteData(){
   const data=await apiRequest('/api/compass');const links=data.links||[];
@@ -277,7 +280,7 @@ function updateRangeLabels(){for(const k of ['importance','urgency','impact','mo
 function eventTypeKey(e){return String(e&&e.type||'').toLowerCase().replace(/[ _-]/g,'');}
 function displayEventNote(note){return String(note||'').replace(/^\[daily-check-in:[^\]]+\]\s*/,'').replace(/\s*\[compass-not-now:[^\]]+\]/g,'').trim();}
 function dismissedTodayGoalIds(){const today=localDateKey(),ids=new Set();(state.events||[]).forEach(e=>{const match=String(e.note||'').match(/\[compass-not-now:([^:\]]+):([^\]]+)\]/);if(match&&match[1]===today)ids.add(match[2]);});return ids;}
-function dailyRecommendations(){let list=ranked(),dismissed=dismissedTodayGoalIds();list=list.filter(g=>!dismissed.has(g.id));if(overrideValid()){const index=list.findIndex(g=>g.id===state.override.id);if(index>0)list.unshift(list.splice(index,1)[0]);}return list.slice(0,3);}
+function dailyRecommendations(){let list=state.goals.filter(g=>g.status==='active').map(g=>({...g,score:scoreForHorizon(g,'today')})).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name)),dismissed=dismissedTodayGoalIds();list=list.filter(g=>!dismissed.has(g.id));if(currentDayOverrideValid()){const index=list.findIndex(g=>g.id===state.override.id);if(index>0)list.unshift(list.splice(index,1)[0]);}return list.slice(0,3);}
 function goalWhyNow(g){
   const reasons=[];const now=Date.now();
   if(g.deadline){const due=new Date(g.deadline+'T23:59:59');if(!Number.isNaN(due.getTime())){const days=Math.ceil((due.getTime()-now)/86400000);if(days<0)reasons.push('Its target date passed '+Math.abs(days)+' day'+(Math.abs(days)===1?'':'s')+' ago; review the deadline or next step.');else if(days===0)reasons.push('Its target date is today.');else if(days<=3)reasons.push('Its target date is in '+days+' day'+(days===1?'':'s')+'.');else if(days<=7)reasons.push('Its target date is within the next week ('+days+' days).');}}
@@ -297,19 +300,21 @@ function renderToday(){
   date.textContent=new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric'}).format(new Date());
   $('#todayDataStatus').textContent=appUser&&remoteConnected?'Signed-in account · permissions apply':'Local demo · starter goals are examples';
   const active=state.goals.filter(g=>g.status==='active').length;
-  const todayEvents=state.events.filter(e=>String(e.at||'').slice(0,10)===localDateKey()).length;
+  const todayEvents=state.events.filter(e=>e.at&&localDateKeyFor(e.at)===localDateKey()).length;
   const confirmed=(emailScoreSignals||[]).filter(s=>s.review_state==='confirmed'&&s.goal_id).length;
   const checkin=todayCheckinEvent();
   const stats=[{value:active,label:'Active goals'},{value:todayEvents,label:'Entries logged today'},{value:confirmed,label:'Confirmed goal-linked email signals'},{value:checkin?'Done':'Open',label:'Daily check-in'}];
   $('#todayStats').innerHTML=stats.map(s=>'<div class="daily-stat"><b>'+escapeHTML(s.value)+'</b><span>'+escapeHTML(s.label)+'</span></div>').join('');
   const plan=dailyRecommendations();
-  $('#dailyPlan').innerHTML=plan.length?plan.map((g,i)=>'<article class="daily-plan-card '+((i===0||overrideValid()&&g.id===state.override.id)?'is-priority':'')+'"><div class="daily-card-top"><div><div class="eyebrow">Suggested move '+(i+1)+(overrideValid()&&g.id===state.override.id?' · Your choice':'')+'</div><h3>'+escapeHTML(g.name)+'</h3></div><div style="text-align:right"><div class="daily-rank">'+scoreGoal(g)+'</div><div class="daily-score">/ 100</div></div></div><div><div class="panel-label">Next action</div><div class="daily-next">'+escapeHTML(g.nextAction||'Edit this goal to define a concrete next action.')+'</div></div><div class="daily-why"><strong style="color:var(--ink);font-weight:500">Why now?</strong> '+escapeHTML(goalWhyNow(g))+'</div><div class="daily-plan-actions"><button type="button" class="primary-btn" data-daily-action="focus" data-goal-id="'+escapeHTML(g.id)+'">Focus this</button><button type="button" class="secondary-btn" data-daily-action="start" data-goal-id="'+escapeHTML(g.id)+'">Start action</button><button type="button" class="secondary-btn" data-daily-action="later" data-goal-id="'+escapeHTML(g.id)+'">Not now · hide until tomorrow</button></div></article>').join(''):'<div class="compact-panel daily-empty"><div class="eyebrow">No recommendations available</div><h3 style="margin:8px 0">Your plan needs an active goal.</h3><p class="muted-copy">Create or activate a goal. If you deferred every suggestion, you can also review Goals and revise your priorities.</p><button type="button" class="primary-btn" data-go-view="goals">Review goals</button></div>';
+  $('#dailyPlan').innerHTML=plan.length?plan.map((g,i)=>'<article class="daily-plan-card '+((i===0||currentDayOverrideValid()&&g.id===state.override.id)?'is-priority':'')+'"><div class="daily-card-top"><div><div class="eyebrow">Suggested move '+(i+1)+(overrideValid()&&g.id===state.override.id?' · Your choice':'')+'</div><h3>'+escapeHTML(g.name)+'</h3></div><div style="text-align:right"><div class="daily-rank">'+scoreForHorizon(g,'today')+'</div><div class="daily-score">/ 100</div></div></div><div><div class="panel-label">Next action</div><div class="daily-next">'+escapeHTML(g.nextAction||'Edit this goal to define a concrete next action.')+'</div></div><div class="daily-why"><strong style="color:var(--ink);font-weight:500">Why now?</strong> '+escapeHTML(goalWhyNow(g))+'</div><div class="daily-plan-actions"><button type="button" class="primary-btn" data-daily-action="focus" data-goal-id="'+escapeHTML(g.id)+'">Focus this</button><button type="button" class="secondary-btn" data-daily-action="start" data-goal-id="'+escapeHTML(g.id)+'">Start action</button><button type="button" class="secondary-btn" data-daily-action="later" data-goal-id="'+escapeHTML(g.id)+'">Not now · hide until tomorrow</button></div></article>').join(''):'<div class="compact-panel daily-empty"><div class="eyebrow">No recommendations available</div><h3 style="margin:8px 0">Your plan needs an active goal.</h3><p class="muted-copy">Create or activate a goal. If you deferred every suggestion, you can also review Goals and revise your priorities.</p><button type="button" class="primary-btn" data-go-view="goals">Review goals</button></div>';
   populateCheckinGoals();
   $('#dailyCheckinStatus').textContent=checkin?'Latest check-in recorded at '+new Date(checkin.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'. You can submit another check-in to update it.':'No check-in recorded today.';
   const sources=[];
   sources.push('<div class="evidence-item"><i class="bullet"></i><span>Calendar</span><b>Not connected</b></div>');
-  sources.push('<div class="evidence-item"><i class="bullet"></i><span>Email signals used for scoring</span><b>'+confirmed+'</b></div>');
-  sources.push('<div class="evidence-item"><i class="bullet"></i><span>Pandora project snapshot</span><b>'+(appUser&&remoteConnected?(sourceSnapshot.projects&&sourceSnapshot.projects.available?'Permission-limited':'Unavailable'):'Not signed in')+'</b></div>');
+  sources.push('<div class="evidence-item"><i class="bullet"></i><span>Confirmed email context</span><b>'+(!appUser||!remoteConnected?'Not signed in':!emailScoreSignalsAvailable?'Unavailable':confirmed+' goal-linked')+'</b></div>');
+  if(emailScoreSignalsAvailable&&emailScoreSignalsSyncedAt)sources.push('<div class="evidence-item"><i class="bullet"></i><span>Email context last checked</span><b>'+escapeHTML(new Date(emailScoreSignalsSyncedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}))+'</b></div>');
+  sources.push('<div class="evidence-item"><i class="bullet"></i><span>Pandora project source</span><b>'+(appUser&&remoteConnected?(sourceSnapshot.projects&&sourceSnapshot.projects.available?'Permission-limited':'Unavailable'):'Not signed in')+'</b></div>');
+  if(appUser&&remoteConnected&&sourceSnapshot.syncedAt)sources.push('<div class="evidence-item"><i class="bullet"></i><span>Project source last checked</span><b>'+escapeHTML(new Date(sourceSnapshot.syncedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}))+'</b></div>');
   sources.push('<div class="evidence-item"><i class="bullet"></i><span>Activity source</span><b>User-logged</b></div>');
   $('#dailyEvidenceNotes').innerHTML=sources.join('');
 }
@@ -329,12 +334,12 @@ function renderWeeklyReview(){
   const highlights=[];
   if(touched.length){const t=touched[0];highlights.push('<div class="weekly-review-item"><div><strong>Most recorded activity</strong><p>'+escapeHTML(t.goal.name)+' · '+t.count+' related entries, including '+t.progress+' progress note'+(t.progress===1?'':'s')+'.</p></div><b>'+t.count+'</b></div>');}
   else highlights.push('<div class="weekly-review-item"><div><strong>No goal-linked activity found</strong><p>This only means no related activity was recorded in Compass during this period.</p></div></div>');
-  highlights.push('<div class="weekly-review-item"><div><strong>Blockers</strong><p>'+(blockers?blockers+' blocker entry'+(blockers===1?'':'ies')+' recorded. Review whether each needs a next step.':'No blockers were logged. That is not proof there were none.')+'</p></div><b>'+blockers+'</b></div>');
+  highlights.push('<div class="weekly-review-item"><div><strong>Blockers</strong><p>'+(blockers?'Recorded '+blockers+' blocker entr'+(blockers===1?'y':'ies')+'. Review whether each needs a next step.':'No blockers were logged. That is not proof there were none.')+'</p></div><b>'+blockers+'</b></div>');
   highlights.push('<div class="weekly-review-item"><div><strong>Check-ins</strong><p>'+(checkins?checkins+' self-reported check-in'+(checkins===1?'':'s')+' recorded.':'No daily check-in was recorded in the last seven days.')+'</p></div><b>'+checkins+'</b></div>');
-  const noProgress=state.goals.filter(g=>g.status==='active'&&!events.some(e=>e.goalId===g.id&&eventTypeKey(e)==='progress')).sort((a,b)=>scoreGoal(b)-scoreGoal(a)).slice(0,3);
+  const noProgress=state.goals.filter(g=>g.status==='active'&&!events.some(e=>e.goalId===g.id&&eventTypeKey(e)==='progress')).sort((a,b)=>scoreForHorizon(b,'week')-scoreForHorizon(a,'week')).slice(0,3);
   if(noProgress.length)highlights.push('<div class="weekly-review-item"><div><strong>Goals without a logged progress note</strong><p>'+noProgress.map(g=>escapeHTML(g.name)).join(', ')+'. Consider whether they need attention or simply an update.</p></div></div>');
-  const next=ranked()[0];
-  if(next)highlights.push('<div class="weekly-review-item"><div><strong>Candidate for next week</strong><p>'+escapeHTML(next.name)+': '+escapeHTML(next.nextAction)+'. Based on current goal inputs, not a guarantee or an automatic commitment.</p></div><b>'+scoreGoal(next)+'</b></div>');
+  const next=state.goals.filter(g=>g.status==='active').map(g=>({...g,score:scoreForHorizon(g,'week')})).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name))[0];
+  if(next)highlights.push('<div class="weekly-review-item"><div><strong>Candidate for next week</strong><p>'+escapeHTML(next.name)+': '+escapeHTML(next.nextAction)+'. Based on current goal inputs, not a guarantee or an automatic commitment.</p></div><b>'+scoreForHorizon(next,'week')+'</b></div>');
   $('#weeklyHighlights').innerHTML=highlights.join('');
   $('#weeklyActivity').innerHTML=events.length?events.slice().sort((a,b)=>Date.parse(b.at||'')-Date.parse(a.at||'')).slice(0,6).map(e=>{const g=getGoal(e.goalId);return '<div class="weekly-review-item"><div><strong>'+escapeHTML(g?g.name:e.goalId?'Removed goal':'General')+' · '+escapeHTML(e.type)+'</strong><p>'+escapeHTML(displayEventNote(e.note))+'</p></div><b>'+escapeHTML(new Date(e.at).toLocaleDateString([], {month:'short',day:'numeric'}))+'</b></div>';}).join(''):'<div class="empty-state">No entries in the last seven days. You can add an update on the Activity page or start with today’s check-in.</div>';
 }
@@ -351,9 +356,9 @@ function resetAll(){if(appUser){alert('Demo reset is disabled while your account
 function renderAll(){document.documentElement.dataset.theme=state.theme==='light'?'light':'dark';$('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===state.mode)));$('#resetDemo').disabled=!!appUser;$('#resetDemo').title=appUser?'Demo reset is disabled for account data':'Reset illustrative local demo data';renderCompass();renderGoals();renderActivity();renderToday();renderWeeklyReview();}
 
 async function loadEmailScoreSignals(){
-  if(!appUser||!remoteConnected){emailScoreSignals=[];return;}
-  try{const data=await apiRequest('/api/email?action=score-context');emailScoreSignals=Array.isArray(data.signals)?data.signals:[];}
-  catch(e){emailScoreSignals=[];}
+  if(!appUser||!remoteConnected){emailScoreSignals=[];emailScoreSignalsAvailable=false;emailScoreSignalsSyncedAt=null;return;}
+  try{const data=await apiRequest('/api/email?action=score-context');emailScoreSignals=Array.isArray(data.signals)?data.signals:[];emailScoreSignalsAvailable=true;emailScoreSignalsSyncedAt=data.syncedAt||new Date().toISOString();}
+  catch(e){emailScoreSignals=[];emailScoreSignalsAvailable=false;emailScoreSignalsSyncedAt=null;}
 }
 async function loadEmailWorkspace(){
   if(!appUser||!remoteConnected){emailWorkspace={providers:{},connections:[],signals:[]};renderConnections();return;}
