@@ -6,6 +6,7 @@ A responsive Goal Compass web app for navigating priorities, progress, and next 
 
 - Production: https://pandora-goal-compass-mbanatao.vercel.app
 - Repository: https://github.com/mbanatao/compass
+- Production readiness checklist: docs/PRODUCTION_READINESS.md
 
 ## Current capabilities
 
