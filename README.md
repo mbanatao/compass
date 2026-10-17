@@ -11,6 +11,9 @@ A responsive Goal Compass web app for navigating priorities, progress, and next 
 ## Current capabilities
 
 - Compass directions, current focus, and deterministic priority scoring.
+- Daily Command Center with up to three evidence-explained next actions, explicit focus/start/defer controls, and date-bound deferrals.
+- Self-reported daily check-in for energy, available focus time, attention, wins, and blockers; check-ins are recorded as activity and do not silently change goal scores.
+- Seven-day review of logged progress, blockers, check-ins, and explicitly recorded time; missing entries are not interpreted as proof that nothing happened.
 - Today, This week, and North Star planning horizons.
 - User-owned goals with direction, success definition, next action, progress, importance, urgency, impact, momentum, evidence confidence, status, and optional deadline.
 - User-directed priority override for the local day.
@@ -101,6 +104,12 @@ Google needs Gmail read-only access (`gmail.readonly`) plus basic verified ident
 Sync is manual, reads at most 25 inbox messages from the last 14 days per account, and uses subject plus a short preview transiently to classify possible replies, deadlines, commitments, and follow-ups. Compass persists only message subject, sender metadata, timestamp, classification, confidence, explanation, user review state, and a provider message link—not the full body or preview. Classifications are heuristic candidates, not verified obligations; the user must review them. Only confirmed signals explicitly linked to a personal goal can affect its urgency, with a small bounded adjustment for overdue/near-term deadlines and reply requests. Dismissed, unreviewed, unlinked, or completed signals do not influence scoring. Compass never sends or deletes email.
 
 Refresh tokens are encrypted with AES-256-GCM before being stored in a user-owned row protected by Supabase RLS. The encryption key is server-side only. Disconnect removes that connection and its saved signals from Compass; use each provider's security settings to revoke the app's consent completely if desired.
+
+## Daily decision loop
+
+The Today page ranks active goals from the existing deterministic scoring model, surfaces target-date and available confirmed/linked source signals where present, and explains the reasons shown on each recommendation. The user remains in control: Focus this records a daily priority choice, Start action records an action-started event, and Not now records a date-bound deferral until the next local day. The weekly Review page summarizes manually recorded activity over the prior seven days; it does not claim to measure unobserved behavior.
+
+The calendar is not connected yet, so the app must not imply it can see true availability or detect schedule conflicts. Daily check-ins are self-reports. Energy and available-time selections are recorded as context; they do not currently change the deterministic scoring weights.
 
 ## Not connected yet
 
