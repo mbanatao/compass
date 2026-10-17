@@ -25,13 +25,17 @@ Status assessed against the deployed application and repository on 2026-10-18.
 - [ ] **Security and privacy review:** confirm retention rules, revocation semantics, rate limiting/abuse controls, HTTPS/security headers, consent copy, and that stale/unavailable source data never silently appears as current.
 - [ ] **Human verification:** test mobile viewport/keyboard accessibility, screen-reader labels, empty/loading/error states, offline/local-demo messaging, and data import/restore on real devices.
 
+## Core decision-loop implementation
+
+The current feature branch implements the first usable version of the daily decision loop: a Today page with up to three deterministically ranked actions, explanations derived from visible goal inputs and linked signals, explicit focus/start/defer actions, a self-reported check-in, and a seven-day review of logged activity. Check-in energy and available time are stored as context only; they do not yet alter scores. The calendar remains disconnected, so true time availability and schedule conflicts are not inferred. These changes are in the draft PR and have not been merged or deployed.
+
 ## Recommended build order
 
-1. Finish release gates above before connecting more private data.
-2. Add **read-only calendar integration** (Google Calendar and Outlook) with clear source timestamps and schedule-conflict warnings.
-3. Add a simple **daily brief** that combines confirmed calendar events, reviewed email signals, active goals, and the user's own check-in into a short prioritized plan.
+1. Validate the daily page, event persistence, mobile behavior, and weekly calculations on the feature branch; run CI and correct any test failures.
+2. Finish release gates above before connecting more private data, especially password recovery/export/deletion, two-account isolation tests, and real OAuth lifecycle tests.
+3. Add **read-only calendar integration** (Google Calendar and Outlook) with clear source timestamps and schedule-conflict warnings. Use it to inform, not silently decide, a daily time budget.
 4. Add **tasks** (Google Tasks, Microsoft To Do, or Todoist) with explicit goal mapping and completion confirmation.
-5. Add **daily check-ins and habit tracking** without external permissions.
+5. Extend **daily check-ins and habit tracking** with optional reminders and user-controlled retention.
 6. Add **personal finance** first through user-entered data and CSV import; only later consider financial-provider connections.
 7. Add optional **Health Connect** summaries and personal knowledge/files integrations after consent, deletion, and retention behavior are proven.
 
