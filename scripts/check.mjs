@@ -14,11 +14,16 @@ for (const [index, match] of inlineScripts.entries()) {
   console.log("PASS: index.html inline script " + (index + 1) + " parses");
 }
 
-for (const path of ["api/health.js", "api/auth.js", "api/compass.js", "lib/server.js"]) {
+for (const path of ["api/health.js", "api/auth.js", "api/compass.js", "api/email.js", "api/email/callback.js", "lib/server.js", "lib/email-oauth.js"]) {
   const source = fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");
   // Parse only. Function constructor catches accidental syntax regressions without executing requests.
   new Function(source.replace(/^\s*["']use strict["'];?\s*/, ""));
   console.log("PASS: " + path + " parses");
 }
+
+assert.doesNotMatch(html, /GOOGLE_OAUTH_CLIENT_SECRET|MICROSOFT_OAUTH_CLIENT_SECRET|EMAIL_OAUTH_ENCRYPTION_KEY|EMAIL_OAUTH_STATE_SECRET/, "OAuth client secrets, token-encryption keys, and state-signing keys must stay server-side");
+assert.match(html, /data-page="connections"/, "Connections workspace is present");
+assert.match(html, /data-email-connect/, "Email authorization controls are present");
+assert.match(html, /pandora\.goal-compass/, "Compass local state namespace remains present");
 
 console.log("Goal Compass source validation passed.");
