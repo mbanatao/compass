@@ -64,7 +64,11 @@ Required environment variables (server-side only):
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY` (or legacy `SUPABASE_ANON_KEY`)
 
-Runtime functions: `api/auth.js`, `api/compass.js`, `api/health.js`.
+Runtime functions: `api/auth.js`, `api/compass.js`, `api/email.js`, `api/email/callback.js`, `api/export.js`, `api/health.js`.
+
+For password recovery, allowlist this exact redirect URL in Supabase Auth settings and validate the email template against a test account:
+
+`https://pandora-goal-compass-mbanatao.vercel.app/?recovery=1`
 
 The project was deployed from GitHub source directly because the connected Vercel Git provider reported that it did not have access to this repo at project-link time. Consequently, future pushes may not auto-deploy until Vercel's GitHub integration has access to `mbanatao/compass`.
 
