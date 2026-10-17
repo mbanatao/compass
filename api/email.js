@@ -25,7 +25,7 @@ async function loadWorkspace(token, userId) {
       user_id: "eq." + userId, order: "provider.asc,account_email.asc", limit: "50"
     })),
     dbRequest(token, "goal_compass_email_signals?" + qs({
-      select: "id,connection_id,provider_message_id,subject,sender_email,sender_name,received_at,signal_type,confidence,evidence_reason,review_state,due_at,action_url",
+      select: "id,connection_id,goal_id,provider_message_id,subject,sender_email,sender_name,received_at,signal_type,confidence,evidence_reason,review_state,due_at,action_url",
       user_id: "eq." + userId, order: "received_at.desc", limit: "60"
     }))
   ]);
@@ -189,6 +189,14 @@ module.exports = async (req, res) => {
     if (!session || !session.user || !session.user.id) return json(res, 401, { error: "Sign in to manage private email connections." });
     const userId = session.user.id;
     if (req.method === "GET") {
+      if (req.query && req.query.action === "score-context") {
+        const rows = await dbRequest(session.accessToken, "goal_compass_email_signals?" + qs({
+          select: "id,goal_id,signal_type,confidence,review_state,due_at,received_at",
+          user_id: "eq." + userId, review_state: "eq.confirmed", goal_id: "not.is.null",
+          order: "due_at.asc.nullslast,received_at.desc", limit: "100"
+        }));
+        return json(res, 200, { signals: Array.isArray(rows) ? rows : [], syncedAt: new Date().toISOString() });
+      }
       const workspace = await loadWorkspace(session.accessToken, userId);
       return json(res, 200, {
         user: { id: userId, email: session.user.email || null },
@@ -224,6 +232,16 @@ module.exports = async (req, res) => {
       const state = ["needs_review", "confirmed", "dismissed", "completed"].includes(body.reviewState) ? body.reviewState : "";
       if (!state) return json(res, 400, { error: "Choose a valid review state." });
       const values = { review_state: state, updated_at: new Date().toISOString() };
+      if (Object.prototype.hasOwnProperty.call(body, "goalId")) {
+        if (body.goalId === null || body.goalId === "") values.goal_id = null;
+        else if (isUuid(body.goalId)) {
+          const ownGoal = await dbRequest(session.accessToken, "goal_compass_goals?" + qs({
+            select: "id", id: "eq." + body.goalId, user_id: "eq." + userId, limit: "1"
+          }));
+          if (!Array.isArray(ownGoal) || !ownGoal.length) return json(res, 400, { error: "Choose a goal owned by this Compass account." });
+          values.goal_id = body.goalId;
+        } else return json(res, 400, { error: "Goal ID is invalid." });
+      }
       if (body.dueAt === null) values.due_at = null;
       else if (typeof body.dueAt === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.dueAt)) values.due_at = new Date(body.dueAt + "T23:59:00.000Z").toISOString();
       await dbRequest(session.accessToken, "goal_compass_email_signals?" + qs({ id: "eq." + body.signalId, user_id: "eq." + userId }), {
