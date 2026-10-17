@@ -75,7 +75,7 @@ GitHub Actions runs this validation on pushes to `main` and on pull requests.
 
 Active goals are scored deterministically from five editable 1–5 factors: importance, urgency, impact, momentum, and evidence confidence. The weights depend on the chosen horizon. A near-term deadline raises effective urgency. Paused and completed goals are excluded. A current-day user override wins in Today mode, with its manual origin labeled explicitly.
 
-When a goal is explicitly linked to visible Pandora projects, currently available task/blocker/needs-you and processed-event signals can adjust the goal's urgency and momentum. Those heuristics are intentionally small and inspectable. They do not establish what the user has actually done in the physical world.
+When a goal is explicitly linked to visible Pandora projects, explicit blocked/failed/review task states and the project experience `needs_you` flag can raise urgency. Completed tasks from the last seven days can raise the momentum factor; raw integration-event volume does not. These small, inspectable heuristics do not establish what the user has actually done in the physical world.
 
 ## Not connected yet
 
