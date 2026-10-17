@@ -18,3 +18,5 @@ jobs:
           node-version: 22
       - name: Parse browser and server JavaScript
         run: node scripts/check.mjs
+      - name: Test server-side security contracts
+        run: node --test tests/security-contracts.test.cjs
