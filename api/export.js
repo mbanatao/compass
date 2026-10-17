@@ -13,16 +13,20 @@ async function fetchAllRows(accessToken, table, select, userId, order) {
   const pageSize = 500;
   const safetyLimit = 20000;
   let offset = 0;
-  while (offset < safetyLimit) {
+  while (offset <= safetyLimit) {
     const query = qs({
       select,
       user_id: "eq." + userId,
       order,
-      limit: pageSize,
+      limit: offset === safetyLimit ? 1 : pageSize,
       offset
     });
     const page = await dbRequest(accessToken, table + "?" + query);
     if (!Array.isArray(page)) throw new Error("An export table returned an unexpected response.");
+    if (offset === safetyLimit) {
+      if (page.length) throw Object.assign(new Error("This export exceeds the safe one-request limit. Contact support for a larger archive."), { status: 413 });
+      return rows;
+    }
     rows.push(...page);
     if (page.length < pageSize) return rows;
     offset += page.length;
