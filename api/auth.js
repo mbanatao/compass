@@ -1,4 +1,4 @@
-const { config, json, originAllowed, establishSession, authFetch, readResponse, setSessionCookies, clearSessionCookies } = require("./_lib/server");
+const { config, json, originAllowed, establishSession, authFetch, readResponse, setSessionCookies, clearSessionCookies } = require("../lib/server");
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   try {
