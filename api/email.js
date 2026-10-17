@@ -99,7 +99,7 @@ async function fetchGoogleMessages(accessToken, accountEmail) {
     if (!response.ok) return null;
     const headerMap = {};
     for (const header of ((msg.payload && msg.payload.headers) || [])) headerMap[String(header.name || "").toLowerCase()] = header.value || "";
-    const receivedAt = msg.internalDate ? new Date(Number(msg.internalDate)).toISOString() : (headerMap.date ? new Date(headerMap.date).toISOString() : null);
+    let receivedAt = null; if (msg.internalDate && Number.isFinite(Number(msg.internalDate))) receivedAt = new Date(Number(msg.internalDate)).toISOString(); else if (headerMap.date) { const parsedDate = new Date(headerMap.date); if (!Number.isNaN(parsedDate.getTime())) receivedAt = parsedDate.toISOString(); }
     const subject = String(headerMap.subject || "(No subject)").slice(0, 300);
     const preview = String(msg.snippet || "").slice(0, 400);
     const sender = parseSender(headerMap.from);
