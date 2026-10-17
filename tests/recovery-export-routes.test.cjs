@@ -115,11 +115,11 @@ test("password reset endpoint preserves provider rate limiting", async () => {
 test("password update sends the recovery token only as bearer authorization", async () => {
   lastAuthRequest = null;
   const res = response();
-  await authRoute(request({ body: { action: "set-recovered-password", recoveryAccessToken: "fixture.jwt.token", newPassword: "new-password-123" }, email: null }), res);
+  await authRoute(request({ body: { action: "set-recovered-password", recoveryAccessToken: "fixture.recovery.access-token", newPassword: "new-password-123" }, email: null }), res);
   assert.equal(res.statusCode, 200);
   assert.equal(lastAuthRequest.route, "user");
   assert.equal(lastAuthRequest.options.method, "PUT");
-  assert.equal(lastAuthRequest.options.headers.Authorization, "Bearer fixture.jwt.token");
+  assert.equal(lastAuthRequest.options.headers.Authorization, "Bearer fixture.recovery.access-token");
   assert.equal(JSON.parse(lastAuthRequest.options.body).password, "new-password-123");
 });
 
