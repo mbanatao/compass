@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
     if (action === "password-recovery") {
       const email = String(body.email || "").trim().toLowerCase();
       const generic = "If an account exists for that address, a password-reset email will be sent.";
-      if (!email || email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+      if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         return json(res, 200, { ok: true, message: generic });
       }
       const redirectTo = "https://pandora-goal-compass-mbanatao.vercel.app/?recovery=1";
