@@ -24,6 +24,11 @@ for (const path of ["api/health.js", "api/auth.js", "api/compass.js", "api/email
 assert.doesNotMatch(html, /GOOGLE_OAUTH_CLIENT_SECRET|MICROSOFT_OAUTH_CLIENT_SECRET|EMAIL_OAUTH_ENCRYPTION_KEY|EMAIL_OAUTH_STATE_SECRET/, "OAuth client secrets, token-encryption keys, and state-signing keys must stay server-side");
 assert.match(html, /data-page="today"/, "Daily command center is present");
 assert.match(html, /data-page="review"/, "Weekly review is present");
+assert.match(html, /id="forgotPassword"/, "Password recovery entry point is present");
+assert.match(html, /id="recoveryUpdateForm"/, "Password recovery completion form is present");
+assert.match(html, /function consumePasswordRecoveryReturn\(/, "Password recovery callback handler is present");
+assert.match(html, /id="exportDataButton"/, "Data export control is present");
+assert.match(html, /function exportPersonalData\(/, "Data export handler is present");
 assert.match(html, /id="dailyPlan"/, "Daily recommendations region is present");
 assert.match(html, /id="dailyCheckinForm"/, "Daily check-in form is present");
 assert.match(html, /function renderToday\(/, "Daily plan render function is present");
