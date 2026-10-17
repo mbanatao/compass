@@ -46,10 +46,10 @@ module.exports = async (req, res) => {
     }
     const userId = session.user.id;
     const [goals, activity, settings, goalProjectLinks, emailConnections, emailSignals] = await Promise.all([
-      fetchAllRows(session.accessToken, "goal_compass_goals", "*", userId, "created_at.asc"),
-      fetchAllRows(session.accessToken, "goal_compass_activity_events", "*", userId, "occurred_at.asc"),
-      fetchAllRows(session.accessToken, "goal_compass_settings", "*", userId, "updated_at.desc"),
-      fetchAllRows(session.accessToken, "goal_compass_goal_project_links", "*", userId, "created_at.asc"),
+      fetchAllRows(session.accessToken, "goal_compass_goals", "id,user_id,name,direction_degrees,description,next_action,importance,urgency,impact,momentum,evidence_confidence,progress,status,target_date,created_at,updated_at", userId, "created_at.asc"),
+      fetchAllRows(session.accessToken, "goal_compass_activity_events", "id,user_id,goal_id,event_type,note,minutes,provenance,source_ref,occurred_at,created_at", userId, "occurred_at.asc"),
+      fetchAllRows(session.accessToken, "goal_compass_settings", "user_id,current_focus_goal_id,planning_horizon,override_goal_id,override_date,theme,updated_at", userId, "updated_at.desc"),
+      fetchAllRows(session.accessToken, "goal_compass_goal_project_links", "id,user_id,goal_id,project_id,relevance,created_at", userId, "created_at.asc"),
       fetchAllRows(session.accessToken, "goal_compass_email_connections",
         "id,provider,account_email,display_name,granted_scopes,status,last_synced_at,last_error,created_at,updated_at",
         userId, "created_at.asc"),
