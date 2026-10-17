@@ -109,7 +109,7 @@ async function fetchGoogleMessages(accessToken, accountEmail) {
       subject, sender_email: sender.email, sender_name: sender.name, received_at: receivedAt,
       signal_type: classification.type, confidence: classification.confidence,
       evidence_reason: classification.reason, due_at: explicitDueDate(subject, preview, receivedAt),
-      action_url: "https://mail.google.com/mail/u/0/#all/" + encodeURIComponent(item.id)
+      action_url: "https://mail.google.com/mail/u/0/?authuser=" + encodeURIComponent(accountEmail) + "#all/" + encodeURIComponent(item.id)
     };
   }));
 }
