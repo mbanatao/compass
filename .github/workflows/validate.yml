@@ -1,6 +1,7 @@
 name: Goal Compass validation
 
 on:
+  workflow_dispatch:
   push:
     branches: [main, production-readiness-foundation]
   pull_request:
