@@ -14,7 +14,7 @@ for (const [index, match] of inlineScripts.entries()) {
   console.log("PASS: index.html inline script " + (index + 1) + " parses");
 }
 
-for (const path of ["api/health.js", "api/auth.js", "api/compass.js", "api/email.js", "api/email/callback.js", "lib/server.js", "lib/email-oauth.js"]) {
+for (const path of ["api/health.js", "api/auth.js", "api/compass.js", "api/email.js", "api/email/callback.js", "api/export.js", "lib/server.js", "lib/email-oauth.js"]) {
   const source = fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");
   // Parse only. Function constructor catches accidental syntax regressions without executing requests.
   new Function(source.replace(/^\s*["']use strict["'];?\s*/, ""));
@@ -29,6 +29,14 @@ assert.match(html, /id="recoveryUpdateForm"/, "Password recovery completion form
 assert.match(html, /function consumePasswordRecoveryReturn\(/, "Password recovery callback handler is present");
 assert.match(html, /id="exportDataButton"/, "Data export control is present");
 assert.match(html, /function exportPersonalData\(/, "Data export handler is present");
+const authApi = fs.readFileSync(new URL("../api/auth.js", import.meta.url), "utf8");
+assert.match(authApi, /password-recovery/, "Password recovery endpoint is present");
+assert.match(authApi, /set-recovered-password/, "Password update endpoint is present");
+assert.match(authApi, /\?recovery=1/, "Password recovery redirect is fixed to the production origin");
+const exportApi = fs.readFileSync(new URL("../api/export.js", import.meta.url), "utf8");
+assert.match(exportApi, /goal_compass_email_signals/, "Data export includes saved email signals");
+assert.doesNotMatch(exportApi, /token_ciphertext/, "Data export must not select encrypted provider refresh tokens");
+
 assert.match(html, /id="dailyPlan"/, "Daily recommendations region is present");
 assert.match(html, /id="dailyCheckinForm"/, "Daily check-in form is present");
 assert.match(html, /function renderToday\(/, "Daily plan render function is present");
