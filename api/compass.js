@@ -95,7 +95,7 @@ module.exports = async (req, res) => {
         if (!saved) return json(res, 500, { error: "Goal save returned no record." });
         if (Array.isArray(body.projectIds)) await syncProjectLinks(session.accessToken, userId, saved.id, body.projectIds);
       } catch (e) {
-        if (e.code === "23505") return json(res, 409, { error: "Each compass direction can have only one goal. Move or rename the goal that already uses this direction." });
+        if (e.code === "23505") return json(res, 409, { error: "This goal already exists. Refresh the workspace and try again." });
         if (e.status === 401 || e.status === 403) return json(res, 403, { error: "The save was blocked by account or row-level permissions." });
         return json(res, 400, { error: "Goal could not be saved. Check for a duplicate direction and valid values." });
       }
